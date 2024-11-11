@@ -6,7 +6,8 @@ export CHAIN_PREFIX="namada"
 export CHAIN_SUFFIX="dryrun"
 unset NAMADA_GENESIS_TX_CHAIN_ID
 export BLOCK_SECONDS="6s"
-export EXTIP=192.64.82.62
+export EXTIP=74.50.93.254
+export SERVE_PORT=8082
 export DOMAIN="namada-dryrun.tududes.com"
 
 
@@ -226,17 +227,16 @@ printf "%b\n%b" "$EXTIP" "$CHAIN_ID" | tee $HOME/.namada-shared/chain.config
 
 
 echo "Updating Config for landing page..."
-#NODE_ID=$(cometbft show-node-id --home $HOME/.local/share/namada/$CHAIN_ID/cometbft/ | awk '{last_line = $0} END {print last_line}')
+NODE_ID=$(cometbft show-node-id --home $HOME/.local/share/namada/$CHAIN_ID/cometbft/ | awk '{last_line = $0} END {print last_line}')
 
 # Write content to $CHAIN_PREFIX.env
-rm -f /usr/share/nginx/html/$ENV_FILENAME
-ENV_FILENAME="$CHAIN_PREFIX.env"
-CONFIGS_SERVER="http://${EXTIP}:${SERVE_PORT}"
+ENV_FILENAME="/usr/share/nginx/html/$CHAIN_PREFIX.env"
+rm -f $ENV_FILENAME
 PEERS="\"tcp://$NODE_ID@${EXTIP}:${P2P_PORT:-26656}\""
-echo "CHAIN_ID=$CHAIN_ID" > /$ENV_FILENAME
-echo "#EXTIP=" >> /$ENV_FILENAME
-echo "CONFIGS_SERVER=https://testnet.$DOMAIN/configs" >> /$ENV_FILENAME
-echo "PERSISTENT_PEERS=$PEERS" >> /usr/share/nginx/html/$ENV_FILENAME
+echo "CHAIN_ID=$CHAIN_ID" > $ENV_FILENAME
+echo "#EXTIP=" >> $ENV_FILENAME
+echo "CONFIGS_SERVER=https://testnet.$DOMAIN/configs" >> $ENV_FILENAME
+echo "PERSISTENT_PEERS=$PEERS" >> $ENV_FILENAME
 
 cp $HOME/namada-campfire/docker/config/local-namada/index.html /usr/share/nginx/html/index.html
 sed -i "s/CHAIN_ID/$CHAIN_ID/g" /usr/share/nginx/html/index.html
