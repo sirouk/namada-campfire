@@ -138,10 +138,12 @@ cd $HOME/.namada-shared/wasm-build/
 echo "Please provide the URL to the prebuilt-wasm.zip file from the Namada CI artifacts"
 read WASM_URL_FROM_GITHUB
 # NOTE: ^^^ must be logged in to grab this and the url will be different
-cd $HOME/.namada-shared/wasm-build/
+mkdir $HOME/.namada-shared/wasm-build/prebuilt-wasm/
+cd $HOME/.namada-shared/wasm-build/prebuilt-wasm/
 wget $WASM_URL_FROM_GITHUB -O prebuilt-wasm.zip
 # LAST FROM: https://github.com/anoma/namada/actions/runs/11725915041/artifacts/2158408260
 unzip prebuilt-wasm.zip
+rm -f prebuilt-wasm.zip
 
 
 # Ensure fresh slate and copy over wasm files and checksum.json
@@ -243,6 +245,7 @@ sed -i "s/DOMAIN/$DOMAIN/g" /usr/share/nginx/html/index.html
 sed -i "s/CHAIN_PREFIX/$CHAIN_PREFIX/g" /usr/share/nginx/html/index.html
 sed -i "s#PEER#$PEERS#g" /usr/share/nginx/html/index.html
 
+rm -rf /usr/share/nginx/html/wasm.tar.gz
 tar -czf /usr/share/nginx/html/wasm.tar.gz $HOME/.namada-shared/wasm
 
 
