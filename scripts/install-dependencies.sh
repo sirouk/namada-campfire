@@ -91,9 +91,11 @@ sudo apt -y update
 echo "**************************************************************************************"
 echo "Installing LetsEncrypt/Certbot"
 echo "**************************************************************************************"
-sudo apt -y install certbot python3 python3-pip python3-certbot-nginx
+sudo apt -y install python3 python3-pip
 
-sudo apt -y --only-upgrade install certbot
 sudo apt -y --only-upgrade install python3-urllib3
 sudo python3 -m pip uninstall urllib3
 sudo python3 -m pip install urllib3
+
+sudo python3 -m pip install pyopenssl --upgrade
+sudo python3 -m pip install certbot certbot-nginx --upgrade 
