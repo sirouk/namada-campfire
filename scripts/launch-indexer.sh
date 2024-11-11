@@ -5,17 +5,17 @@
 rm -rf ~/namada-indexer
 cd ~
 #git clone -b main https://github.com/anoma/namada-indexer.git
-git clone -b patch-2 https://github.com/sirouk/namada-indexer.git
-#cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
+git clone https://github.com/sirouk/namada-indexer.git
+cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
 #cd $HOME/namada-indexer && git fetch --all && git checkout chore/update-namada-to-0.43.0 && git pull
-cd $HOME/namada-indexer && git fetch --all && git checkout patch-2 && git pull
+#cd $HOME/namada-indexer && git fetch --all && git checkout patch-2 && git pull
 
 
 # prep are vars
 #export DATABASE_URL="postgres://postgres:password@postgres:5432/namada-indexer"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:5433/namada-indexer"
 export DATABASE_URL="postgres://postgres:password@postgres:5433/namada-indexer"
-export TENDERMINT_URL="http://172.17.0.1:26657"
+export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 #export TENDERMINT_URL="http://127.0.0.1:27657"
 export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$HOME/chaindata/namada-1/global-config.toml")
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
@@ -61,7 +61,8 @@ echo "Copied $CHAINDATA_PATH/wasm/checksums.json"
 sed -i 's#^read_past_height_limit = .*#read_past_height_limit = 360000#' $CHAINDATA_PATH/config.toml
 # echo output about the change and restart
 echo "Changed read_past_height_limit to 360000 in $CHAINDATA_PATH/config.toml, restarting node..."
-docker container restart compose-namada-1-1
+# restart the node
+sudo systemctl restart namada-node
 
 
 # bring down any existing volumes
