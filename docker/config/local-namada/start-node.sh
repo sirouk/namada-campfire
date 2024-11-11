@@ -60,70 +60,73 @@ if [ $(hostname) = "namada-1" ]; then
 
     echo "Validator configs found. Generating chain configs..."
 
-    # create a pgf steward account with alias 'steward-1' and generate signed toml
-    STEWARD_ALIAS="steward-1"
-    namadaw --pre-genesis gen --alias $STEWARD_ALIAS --unsafe-dont-encrypt
-    mkdir /root/.namada-shared/$STEWARD_ALIAS
-    est_output=$(namadac utils init-genesis-established-account \
-      --path "/root/.namada-shared/$STEWARD_ALIAS/unsigned-transactions.toml" \
-      --aliases $STEWARD_ALIAS)
-    echo $est_output
-    steward_address=$(echo $est_output | grep -o 'tnam[[:alnum:]]*')
-    # steward_address=$(grep -A1 "\[addresses\]" /root/.local/share/namada/pre-genesis/wallet.toml | grep $STEWARD_ALIAS | awk -F' = ' '{print $2}' | tr -d '"')
-    namadac utils sign-genesis-txs \
-      --path "/root/.namada-shared/$STEWARD_ALIAS/unsigned-transactions.toml" \
-      --output "/root/.namada-shared/$STEWARD_ALIAS/transactions.toml"
-    rm -rf /root/.namada-shared/$STEWARD_ALIAS/unsigned-transactions.toml
+    # # create a pgf steward account with alias 'steward-1' and generate signed toml
+    # STEWARD_ALIAS="steward-1"
+    # namadaw --pre-genesis gen --alias $STEWARD_ALIAS --unsafe-dont-encrypt
+    # mkdir /root/.namada-shared/$STEWARD_ALIAS
+    # est_output=$(namadac utils init-genesis-established-account \
+    #   --path "/root/.namada-shared/$STEWARD_ALIAS/unsigned-transactions.toml" \
+    #   --aliases $STEWARD_ALIAS)
+    # echo $est_output
+    # steward_address=$(echo $est_output | grep -o 'tnam[[:alnum:]]*')
+    # # steward_address=$(grep -A1 "\[addresses\]" /root/.local/share/namada/pre-genesis/wallet.toml | grep $STEWARD_ALIAS | awk -F' = ' '{print $2}' | tr -d '"')
+    # namadac utils sign-genesis-txs \
+    #   --path "/root/.namada-shared/$STEWARD_ALIAS/unsigned-transactions.toml" \
+    #   --output "/root/.namada-shared/$STEWARD_ALIAS/transactions.toml"
+    # rm -rf /root/.namada-shared/$STEWARD_ALIAS/unsigned-transactions.toml
 
-    # create a faucet account and signed-toml
-    FAUCET_ALIAS="faucet-1"
-    namadaw --pre-genesis gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
-    mkdir -p /root/.namada-shared/$FAUCET_ALIAS
-    est_output=$(namadac utils init-genesis-established-account \
-      --path "/root/.namada-shared/$FAUCET_ALIAS/unsigned-transactions.toml" \
-      --aliases $FAUCET_ALIAS)
-    echo $est_output
-    # faucet_address=$(echo $est_output | grep -o 'tnam[[:alnum:]]*')
-    faucet_address=$(grep -A1 "\[addresses\]" /root/.local/share/namada/pre-genesis/wallet.toml | grep $FAUCET_ALIAS | awk -F' = ' '{print $2}' | tr -d '"')
-    namadac utils sign-genesis-txs \
-      --path "/root/.namada-shared/$FAUCET_ALIAS/unsigned-transactions.toml" \
-      --output "/root/.namada-shared/$FAUCET_ALIAS/transactions.toml"
-    rm -rf /root/.namada-shared/$FAUCET_ALIAS/unsigned-transactions.toml
+    # # create a faucet account and signed-toml
+    # FAUCET_ALIAS="faucet-1"
+    # namadaw --pre-genesis gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
+    # mkdir -p /root/.namada-shared/$FAUCET_ALIAS
+    # est_output=$(namadac utils init-genesis-established-account \
+    #   --path "/root/.namada-shared/$FAUCET_ALIAS/unsigned-transactions.toml" \
+    #   --aliases $FAUCET_ALIAS)
+    # echo $est_output
+    # # faucet_address=$(echo $est_output | grep -o 'tnam[[:alnum:]]*')
+    # faucet_address=$(grep -A1 "\[addresses\]" /root/.local/share/namada/pre-genesis/wallet.toml | grep $FAUCET_ALIAS | awk -F' = ' '{print $2}' | tr -d '"')
+    # namadac utils sign-genesis-txs \
+    #   --path "/root/.namada-shared/$FAUCET_ALIAS/unsigned-transactions.toml" \
+    #   --output "/root/.namada-shared/$FAUCET_ALIAS/transactions.toml"
+    # rm -rf /root/.namada-shared/$FAUCET_ALIAS/unsigned-transactions.toml
 
     # since 0.43.0, balances.toml needs the tnam instead of tpknam. so write those to a file for later
-    echo "genesis_account_array = [
-      ['steward-1', '$steward_address',],
-      ['faucet-1', '$faucet_address',]
-    ]" > /scripts/genesis_accounts.py
+    # echo "genesis_account_array = [
+    #   ['steward-1', '$steward_address',],
+    #   ['faucet-1', '$faucet_address',]
+    # ]" > /scripts/genesis_accounts.py
 
     # create directory for genesis toml files
     mkdir -p /root/.namada-shared/genesis
+    cp /genesis/balances.toml /root/.namada-shared/genesis/balances.toml
     cp /genesis/parameters.toml /root/.namada-shared/genesis/parameters.toml
     cp /genesis/tokens.toml /root/.namada-shared/genesis/tokens.toml
-    cp /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
     cp /genesis/transactions.toml /root/.namada-shared/genesis/transactions.toml
+    cp /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
 
     # add genesis transactions to transactions.toml
     # TODO: move to python script
-    cat /root/.namada-shared/namada-1/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
-    cat /root/.namada-shared/namada-3/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
-    cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
-    cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+    #cat /root/.namada-shared/namada-1/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+    #cat /root/.namada-shared/namada-3/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+    #cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+    #cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
 
     # append all the submitted transactions.tomls in the 'submitted' directory
-    for file in /genesis/submitted/*; do
-      echo "" >> /root/.namada-shared/genesis/transactions.toml # ensure newline
-      cat "$file" >> /root/.namada-shared/genesis/transactions.toml
-    done
+    # for file in /genesis/submitted/*; do
+    #   echo "" >> /root/.namada-shared/genesis/transactions.toml # ensure newline
+    #   cat "$file" >> /root/.namada-shared/genesis/transactions.toml
+    # done
 
-    python3 /scripts/make_balances.py /root/.namada-shared /genesis/balances.toml $SELF_BOND_AMT > /root/.namada-shared/genesis/balances.toml
+    #python3 /scripts/make_balances.py /root/.namada-shared /genesis/balances.toml $SELF_BOND_AMT > /root/.namada-shared/genesis/balances.toml
 
-    echo "Genesis balances:"
-    cat /root/.namada-shared/genesis/balances.toml
+    echo "Genesis balances preview:"
+    head -n10 /root/.namada-shared/genesis/balances.toml
+    echo "..."
+    tail -n10 /root/.namada-shared/genesis/balances.toml
     echo ""
 
     # add steward address to parameters.toml
-    sed -i "s#STEWARD_ADDR#$steward_address#g" /root/.namada-shared/genesis/parameters.toml
+    #sed -i "s#STEWARD_ADDR#$steward_address#g" /root/.namada-shared/genesis/parameters.toml
 
     # extract the tx and vp checksums from the checksums.json file
     TX_CHECKSUMS=$(jq -r 'to_entries[] | select(.key | startswith("tx")) | .value' /wasm/checksums.json | sed 's/.*\.\(.*\)\..*/"\1"/' | paste -sd "," -)
@@ -134,11 +137,13 @@ if [ $(hostname) = "namada-1" ]; then
     sed -i "s#vp_whitelist = \[\]#vp_whitelist = [$VP_CHECKSUMS]#" ~/.namada-shared/genesis/parameters.toml
 
     # add a random word to the chain prefix for human readability
-    RANDOM_WORD=$(shuf -n 1 /root/words)
+    #RANDOM_WORD=$(shuf -n 1 /root/words)
+    RANDOM_WORD="dryrun"
     FULL_PREFIX="${CHAIN_PREFIX}-${RANDOM_WORD}"
 
     # create the chain configs
-    GENESIS_TIME=$(date -u -d "+$GENESIS_DELAY_MINS minutes" +"%Y-%m-%dT%H:%M:%S.000000000+00:00")
+    #GENESIS_TIME=$(date -u -d "+$GENESIS_DELAY_MINS minutes" +"%Y-%m-%dT%H:%M:%S.000000000+00:00")
+    GENESIS_TIME="2024-11-12T15:00:00.000000000+00:00"
     INIT_OUTPUT=$(namadac utils init-network \
       --genesis-time "$GENESIS_TIME" \
       --wasm-checksums-path /wasm/checksums.json \
