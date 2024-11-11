@@ -1,5 +1,3 @@
-# source: https://github.com/heliaxdev/namada-network-templates/blob/fraccaman/housefire-campfire/devnet/campfire/validity-predicates.toml
-
 # WASM Validity predicate that can be used for genesis accounts
 
 # Implicit VP
@@ -9,11 +7,3 @@ filename = "vp_implicit.wasm"
 # Default user VP in established accounts
 [wasm.vp_user]
 filename = "vp_user.wasm"
-
-# # Default validator VP
-# [wasm.vp_validator]
-# filename = "vp_validator.wasm"
-
-# # MASP VP
-# [wasm.vp_masp]
-# filename = "vp_masp.wasm"
