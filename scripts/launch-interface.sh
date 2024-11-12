@@ -22,12 +22,12 @@ cp -f $HOME/namada-campfire/docker/container-build/namada-interface/Dockerfile $
 
 
 export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
-export CHAIN_DATA=${CHAIN_DATA:-$CAMPFIRE_CHAIN_DATA}
+export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
 
-
-export CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAIN_DATA/global-config.toml")
-export NAM=$(awk '/\[addresses\]/ {found=1} found && /nam = / {gsub(/.*= "/, ""); sub(/"$/, ""); print; exit}' "$CHAIN_DATA/$CHAIN_ID/wallet.toml")
-export FAUCET_ADDRESS=$(awk '/\[addresses\]/ {found=1} found && /faucet-1 = / {gsub(/.*= "/, ""); sub(/"$/, ""); sub(/unencrypted:/, ""); print; exit}' "$CHAIN_DATA/$CHAIN_ID/wallet.toml")
+export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/global-config.toml")
+export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
+export NAM=$(awk '/\[addresses\]/ {found=1} found && /nam = / {gsub(/.*= "/, ""); sub(/"$/, ""); print; exit}' "$CHAINDATA_PATH/$CHAIN_ID/wallet.toml")
+#export FAUCET_ADDRESS=$(awk '/\[addresses\]/ {found=1} found && /faucet-1 = / {gsub(/.*= "/, ""); sub(/"$/, ""); sub(/unencrypted:/, ""); print; exit}' "$CHAINDATA_PATH/$CHAIN_ID/wallet.toml")
 
 
 # Load Campfire vars in environment
@@ -49,9 +49,9 @@ env_file="$REPO_DIR/$INTERFACE_DIR/.env"
     echo "NAMADA_INTERFACE_INDEXER_URL=\"https://indexer.$DOMAIN:443\""
     echo "INDEXER_URL=\"https://indexer.$DOMAIN:443\"" # used for bootstrap_config.sh
 
-    echo "REACT_APP_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
-    echo "NAMADA_INTERFACE_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
-    echo "NAMADA_INTERFACE_NAMADA_FAUCET_LIMIT=1000"
+    # echo "REACT_APP_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
+    # echo "NAMADA_INTERFACE_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
+    # echo "NAMADA_INTERFACE_NAMADA_FAUCET_LIMIT=1000"
 
 } > "$env_file"
 

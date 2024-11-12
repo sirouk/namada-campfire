@@ -4,7 +4,10 @@
 
 HTML_PATH="/usr/share/nginx/html"
 DOMAIN=$(grep -oP '(?<=href="https://testnet.).*?(?=/)' "$HTML_PATH/index.html" | head -1)
-CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$HOME/chaindata/namada-2/global-config.toml")
+export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-2"
+export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
+export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/global-config.toml")
+export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 SNAP_TIME=$(date -u +"%Y-%m-%dT%H.%M")
 SNAP_FILENAME="${CHAIN_ID}_${SNAP_TIME}.tar.lz4"
 
