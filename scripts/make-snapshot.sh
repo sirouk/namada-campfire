@@ -12,7 +12,7 @@ SNAP_TIME=$(date -u +"%Y-%m-%dT%H.%M")
 SNAP_FILENAME="${CHAIN_ID}_${SNAP_TIME}.tar.lz4"
 
 sudo systemctl stop namada-node
-sudo tar -C $CAMPFIRE_CHAIN_DATA/$CHAIN_ID -cf - db cometbft/data | lz4 - $HOME/$SNAP_FILENAME
+sudo tar -C $CHAINDATA_PATH/$CHAIN_ID -cf - db cometbft/data | lz4 - $HOME/$SNAP_FILENAME
 sudo rm -f $HTML_PATH/*.tar.lz4
 sudo mv -f $HOME/$SNAP_FILENAME $HTML_PATH/$SNAP_FILENAME
 sudo sed -i.bak -e "s|Snapshot: <a href=\".*\">Download</a>|Snapshot: <a href=\"https://testnet.$DOMAIN/$SNAP_FILENAME\">Download</a>|" "$HTML_PATH/index.html"
