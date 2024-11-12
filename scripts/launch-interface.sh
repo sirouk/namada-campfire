@@ -11,14 +11,13 @@ INTERFACE_DIR="apps/namadillo"
 rm -rf ~/namada-interface
 cd $HOME
 #git clone -b v0.1.0-0e77e71 https://github.com/anoma/namada-interface.git
-git clone -b main https://github.com/anoma/$REPO_NAME.git
+git clone https://github.com/anoma/$REPO_NAME.git
 
 #cd $HOME/namada-interface && git checkout 1ed4d1285ffbf654c84a80353537023ba98e0614
 cd $REPO_DIR && git fetch --all && git checkout main && git pull
 cp -f $HOME/namada-campfire/docker/container-build/namada-interface/Dockerfile $REPO_DIR/Dockerfile-interface
 #cp -f $REPO_DIR/docker/namadillo/Dockerfile $REPO_DIR/Dockerfile-interface # needs help with writing the config
 #cp -f $HOME/namada-campfire/docker/container-build/namada-interface/nginx.conf $REPO_DIR/nginx.conf
-
 
 
 export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
@@ -36,18 +35,18 @@ source $HOME/campfire.env
 # write env file
 env_file="$REPO_DIR/$INTERFACE_DIR/.env"
 {
-    echo "NODE_ENV=\"development\""
-    echo "NAMADA_INTERFACE_LOCAL=\"false\""
+    echo "NODE_ENV=development"
+    echo "NAMADA_INTERFACE_LOCAL=false"
 
-    echo "NAMADA_INTERFACE_NAMADA_ALIAS=\"Campfire Testnet\""
-    echo "NAMADA_INTERFACE_NAMADA_TOKEN=\"$NAM\""
-    echo "NAMADA_INTERFACE_NAMADA_CHAIN_ID=\"$CHAIN_ID\""
-    echo "NAMADA_INTERFACE_NAMADA_URL=\"https://rpc.$DOMAIN:443\""
-    echo "RPC_URL=\"https://rpc.$DOMAIN:443\"" # used for bootstrap_config.sh
+    echo "NAMADA_INTERFACE_NAMADA_ALIAS=Namada Dry Run"
+    echo "NAMADA_INTERFACE_NAMADA_TOKEN=$NAM"
+    echo "NAMADA_INTERFACE_NAMADA_CHAIN_ID=$CHAIN_ID"
+    echo "NAMADA_INTERFACE_NAMADA_URL=https://rpc.$DOMAIN:443"
+    echo "RPC_URL=https://rpc.$DOMAIN:443" # used for bootstrap_config.sh
     
-    echo "NAMADA_INTERFACE_NAMADA_BECH32_PREFIX=\"tnam\""
-    echo "NAMADA_INTERFACE_INDEXER_URL=\"https://indexer.$DOMAIN:443\""
-    echo "INDEXER_URL=\"https://indexer.$DOMAIN:443\"" # used for bootstrap_config.sh
+    echo "NAMADA_INTERFACE_NAMADA_BECH32_PREFIX=tnam"
+    echo "NAMADA_INTERFACE_INDEXER_URL=https://indexer.$DOMAIN:443"
+    echo "INDEXER_URL=https://indexer.$DOMAIN:443" # used for bootstrap_config.sh
 
     # echo "REACT_APP_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
     # echo "NAMADA_INTERFACE_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
@@ -63,8 +62,8 @@ env_file="$REPO_DIR/$INTERFACE_DIR/.env"
 # write config file
 config_file="$REPO_DIR/$INTERFACE_DIR/public/config.toml"
 {
-    echo "indexer_url = \"https://indexer.$DOMAIN:443\""
-    echo "rpc_url = \"https://rpc.$DOMAIN:443\""
+    echo "indexer_url = https://indexer.$DOMAIN:443"
+    echo "rpc_url = https://rpc.$DOMAIN:443"
 } > "$config_file"
 
 # tear down
