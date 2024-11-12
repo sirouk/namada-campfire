@@ -8,7 +8,6 @@ unset NAMADA_GENESIS_TX_CHAIN_ID
 export BLOCK_SECONDS="6s"
 export EXTIP=74.50.93.254
 export SERVE_PORT=8082
-export DOMAIN="namada-dryrun.tududes.com"
 
 
 sudo apt update && sudo apt upgrade -y
@@ -228,6 +227,11 @@ printf "%b\n%b" "$EXTIP" "$CHAIN_ID" | tee $HOME/.namada-shared/chain.config
 
 echo "Updating Config for landing page..."
 NODE_ID=$(cometbft show-node-id --home $HOME/.local/share/namada/$CHAIN_ID/cometbft/ | awk '{last_line = $0} END {print last_line}')
+
+# fetch domain info
+HTML_PATH="/usr/share/nginx/html"
+DOMAIN=$(grep -oP '(?<=href="https://testnet.).*?(?=/)' "$HTML_PATH/index.html" | head -1)
+
 
 # Write content to $CHAIN_PREFIX.env
 ENV_FILENAME="/usr/share/nginx/html/$CHAIN_PREFIX.env"
