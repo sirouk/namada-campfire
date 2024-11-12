@@ -4,8 +4,8 @@
 # Grab the repo
 rm -rf ~/namada-indexer
 cd ~
-#git clone -b main https://github.com/anoma/namada-indexer.git
-git clone https://github.com/sirouk/namada-indexer.git
+git clone https://github.com/anoma/namada-indexer.git
+#git clone https://github.com/sirouk/namada-indexer.git
 cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
 #cd $HOME/namada-indexer && git fetch --all && git checkout chore/update-namada-to-0.43.0 && git pull
 #cd $HOME/namada-indexer && git fetch --all && git checkout patch-2 && git pull
@@ -15,6 +15,7 @@ cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
 #export DATABASE_URL="postgres://postgres:password@postgres:5432/namada-indexer"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:5433/namada-indexer"
 export DATABASE_URL="postgres://postgres:password@postgres:5433/namada-indexer"
+export DATABASE_URL_TEST="postgres://postgres:password@0.0.0.0:5433"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 #export TENDERMINT_URL="http://127.0.0.1:27657"
 
@@ -52,6 +53,7 @@ env_file="$HOME/namada-indexer/.env"
     echo "CACHE_URL=\"$CACHE_URL\""
     echo "WEBSERVER_PORT=\"$WEBSERVER_PORT\""
     echo "PORT=\"$WEBSERVER_PORT\""
+    #echo "DATABASE_URL_TEST=\"$DATABASE_URL_TEST\""
 } > "$env_file"
 
 # copy checksums.json
@@ -82,6 +84,9 @@ if [ -z "${LOGS_NOFOLLOW}" ]; then
 fi
 
 # build and start the containers
+#curl https://sh.rustup.rs -sSf | sh -s -- -y && source "$HOME/.cargo/env" -- -y
+#rustup update
 #cargo install just
 #just docker-up
 docker compose -f $HOME/namada-indexer/docker-compose.yml --env-file $HOME/namada-indexer/.env up -d
+
