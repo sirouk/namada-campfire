@@ -17,8 +17,13 @@ cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
 export DATABASE_URL="postgres://postgres:password@postgres:5433/namada-indexer"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 #export TENDERMINT_URL="http://127.0.0.1:27657"
-export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$HOME/chaindata/namada-1/global-config.toml")
+
+export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
+export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
+export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/global-config.toml")
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
+
+
 export CACHE_URL="redis://dragonfly:6379"
 #export CACHE_URL="redis://redis@0.0.0.0:6379"
 export WEBSERVER_PORT="6000"
