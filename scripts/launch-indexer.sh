@@ -12,10 +12,9 @@ cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
 
 
 # prep are vars
-#export DATABASE_URL="postgres://postgres:password@postgres:5432/namada-indexer"
-#export DATABASE_URL="postgres://postgres:password@0.0.0.0:5433/namada-indexer"
-export DATABASE_URL="postgres://postgres:password@postgres:5433/namada-indexer"
-export DATABASE_URL_TEST="postgres://postgres:password@0.0.0.0:5433"
+export POSTGRES_PORT="5433"
+export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/namada-indexer"
+export DATABASE_URL_TEST="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 #export TENDERMINT_URL="http://127.0.0.1:27657"
 
@@ -77,10 +76,22 @@ cd $HOME/namada-indexer
 
 # tear down
 docker compose -f docker-compose.yml down --volumes
-docker stop $(docker container ls --all | grep 'indexer' | awk '{print $1}')
-docker container rm --force $(docker container ls --all | grep 'indexer' | awk '{print $1}')
+docker stop $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
+docker container rm --force $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 if [ -z "${LOGS_NOFOLLOW}" ]; then
-    docker image rm --force $(docker image ls --all | grep 'indexer' | awk '{print $3}')
+    docker image rm --force $(docker image ls --all | grep 'namada-indexer' | awk '{print $3}')
+fi
+
+# prune all volumes (db data)
+docker volume prune -f
+
+POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
+if [ -n "$POSTGRES_CONTAINER_ID" ]; then
+    echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
+    docker stop "$POSTGRES_CONTAINER_ID"
+    docker rm "$POSTGRES_CONTAINER_ID"
+else
+    echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
 fi
 
 # build and start the containers
