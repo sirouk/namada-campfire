@@ -48,22 +48,20 @@ env_file=$HOME/namada-interface/apps/faucet/.env
 
 # source the env before building
 source $env_file
-
+cd $HOME/namada-interface
 
 # Tear down any conatiners, remove them and their images
-docker stop $(docker container ls --all | grep 'faucet-fe' | awk '{print $1}')
-docker container rm --force $(docker container ls --all | grep 'faucet-fe' | awk '{print $1}')
-if [ -z "${LOGS_NOFOLLOW}" ]; then
+if [ -n "${LOGS_NOFOLLOW}" ]; then
+    docker stop $(docker container ls --all | grep 'faucet-fe' | awk '{print $1}')
+    docker container rm --force $(docker container ls --all | grep 'faucet-fe' | awk '{print $1}')
     docker image rm --force $(docker image ls --all | grep 'faucet-fe' | awk '{print $3}')
 fi
 
-# Build
-cd $HOME/namada-interface
 docker build -t faucet-fe:local .
 
+docker stop $(docker container ls --all | grep 'faucet-fe' | awk '{print $1}')
+docker container rm --force $(docker container ls --all | grep 'faucet-fe' | awk '{print $1}')
 
-# Start the faucet frontend
-cd $HOME/namada-interface
 docker run --name faucet-fe -d -p "4000:80" faucet-fe:local
 
 

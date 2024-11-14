@@ -15,6 +15,10 @@ git clone https://github.com/anoma/$REPO_NAME.git
 
 #cd $HOME/namada-interface && git checkout 1ed4d1285ffbf654c84a80353537023ba98e0614
 cd $REPO_DIR && git fetch --all && git checkout main && git pull
+
+# test commit with chain phase ungating features
+git checkout 91332b30e88e4844b86fc95be2b598e79a80222f
+
 cp -f $HOME/namada-campfire/docker/container-build/namada-interface/Dockerfile $REPO_DIR/Dockerfile-interface
 #cp -f $REPO_DIR/docker/namadillo/Dockerfile $REPO_DIR/Dockerfile-interface # needs help with writing the config
 #cp -f $HOME/namada-campfire/docker/container-build/namada-interface/nginx.conf $REPO_DIR/nginx.conf
@@ -69,16 +73,21 @@ config_file="$REPO_DIR/$INTERFACE_DIR/public/config.toml"
     echo "masp_indexer_url = https://masp.$DOMAIN:443"
 } > "$config_file"
 
-# tear down
-docker stop $(docker container ls --all | grep 'interface' | awk '{print $1}')
-docker container rm --force $(docker container ls --all | grep 'interface' | awk '{print $1}')
-if [ -z "${LOGS_NOFOLLOW}" ]; then
-    docker image rm --force $(docker image ls --all | grep 'interface' | awk '{print $3}')
-fi
 
 # load Namadillo env vars, build, and run
 source $env_file
+
+if [ -n "${LOGS_NOFOLLOW}" ]; then
+    docker stop $(docker container ls --all | grep 'interface' | awk '{print $1}')
+    docker container rm --force $(docker container ls --all | grep 'interface' | awk '{print $1}')
+    docker image rm --force $(docker image ls --all | grep 'interface' | awk '{print $3}')
+fi
+
 docker build -f $REPO_DIR/Dockerfile-interface --build-arg INDEXER_URL="$INDEXER_URL" --build-arg RPC_URL="$RPC_URL" --build-arg MASP_INDEXER_URL="$MASP_INDEXER_URL" -t interface:local $REPO_DIR
+
+docker stop $(docker container ls --all | grep 'interface' | awk '{print $1}')
+docker container rm --force $(docker container ls --all | grep 'interface' | awk '{print $1}')
+
 docker run --name interface -d --env-file $env_file -p "3000:80" interface:local
 
 
