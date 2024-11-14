@@ -48,6 +48,8 @@ env_file="$REPO_DIR/$INTERFACE_DIR/.env"
     echo "NAMADA_INTERFACE_INDEXER_URL=https://indexer.$DOMAIN:443"
     echo "INDEXER_URL=https://indexer.$DOMAIN:443" # used for bootstrap_config.sh
 
+    echo "MASP_INDEXER_URL=https://masp.$DOMAIN:443" # used for bootstrap_config.sh
+
     # echo "REACT_APP_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
     # echo "NAMADA_INTERFACE_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
     # echo "NAMADA_INTERFACE_NAMADA_FAUCET_LIMIT=1000"
@@ -64,6 +66,7 @@ config_file="$REPO_DIR/$INTERFACE_DIR/public/config.toml"
 {
     echo "indexer_url = https://indexer.$DOMAIN:443"
     echo "rpc_url = https://rpc.$DOMAIN:443"
+    echo "masp_indexer_url = https://masp.$DOMAIN:443"
 } > "$config_file"
 
 # tear down
@@ -75,7 +78,7 @@ fi
 
 # load Namadillo env vars, build, and run
 source $env_file
-docker build -f $REPO_DIR/Dockerfile-interface --build-arg INDEXER_URL="$INDEXER_URL" --build-arg RPC_URL="$RPC_URL" -t interface:local $REPO_DIR
+docker build -f $REPO_DIR/Dockerfile-interface --build-arg INDEXER_URL="$INDEXER_URL" --build-arg RPC_URL="$RPC_URL" --build-arg MASP_INDEXER_URL="$MASP_INDEXER_URL" -t interface:local $REPO_DIR
 docker run --name interface -d --env-file $env_file -p "3000:80" interface:local
 
 

@@ -197,7 +197,7 @@ export NAMADA_TAG=v0.35.1
 docker compose -f ~/namada-campfire/docker/compose/docker-compose-local-namada.yml --env-file ~/campfire.env up -d
 ```
 3. After the chain has started, you can obtain the chain-id, faucet private-key and NAM token address (both found in the wallet.toml of the namada-1 node `~/chaindata/namada-1/$CHAIN_ID/wallet.toml`). You can now start the faucet backend:  
-`docker run --name faucet-be -d -p "5000:5000" faucet-be:local ./server --cargo-env development --difficulty 3 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port 5000 --rps 10  --rpc http://172.17.0.1:26657`  
+`docker run --name faucet-be -d -p "5001:5000" faucet-be:local ./server --cargo-env development --difficulty 3 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port 5001 --rps 10  --rpc http://172.17.0.1:26657`  
 and frontend:  
 `docker run --name faucet-fe -d -p "4000:80" faucet-fe:local`  
 

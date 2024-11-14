@@ -85,7 +85,7 @@ services:
       context: .
       dockerfile: webserver/Dockerfile
     ports:
-      - 5000:5000
+      - 6000:5000
     environment:
       DATABASE_URL: postgres://postgres:password@postgres:5435/namada-indexer
       CACHE_URL: redis://dragonfly:6379
