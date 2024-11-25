@@ -64,7 +64,8 @@ if ! [[ $# -eq 1 && $1 == "-y" ]]; then
         echo "No image found matching: '$image'."
       fi
     done
-
+    # for the indexer
+    docker image rm --force $(docker image ls --all | grep -E '^namada/.*-indexer.*$' | awk '{print $3}')
   fi
 fi
 
