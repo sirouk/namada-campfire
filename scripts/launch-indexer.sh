@@ -79,7 +79,8 @@ docker compose -f docker-compose.yml down --volumes
 docker stop $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 if [ -z "${LOGS_NOFOLLOW}" ]; then
-    docker image rm --force $(docker image ls --all | grep 'namada-indexer' | awk '{print $3}')
+    echo "Removing namada-indexer images"
+    docker image rm --force $(docker image ls --all | grep -E '^namada/.*-indexer.*$' | awk '{print $3}')
 fi
 
 # prune all volumes (db data)
