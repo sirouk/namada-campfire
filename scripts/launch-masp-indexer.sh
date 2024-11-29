@@ -36,10 +36,10 @@ cd $HOME/namada-masp-indexer
 
 # tear down
 docker compose -f docker-compose.yml down --volumes
-docker stop $(docker container ls --all | grep 'masp-indexer' | awk '{print $1}')
-docker container rm --force $(docker container ls --all | grep 'masp-indexer' | awk '{print $1}')
+docker stop $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
+docker container rm --force $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
 if [ -z "${LOGS_NOFOLLOW}" ]; then
-    docker image rm --force $(docker image ls --all | grep 'masp-indexer' | awk '{print $3}')
+    docker image rm --force $(docker image ls --all | grep 'namada-masp-' | awk '{print $3}')
 fi
 
 # prune all volumes (db data)
