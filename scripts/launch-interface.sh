@@ -17,7 +17,7 @@ git clone https://github.com/anoma/$REPO_NAME.git
 cd $REPO_DIR && git fetch --all && git checkout main && git pull
 
 # test commit with chain phase ungating features
-git checkout 930e124d2344e6c16e18428185a65c94283339a1
+#git checkout 930e124d2344e6c16e18428185a65c94283339a1
 
 cp -f $HOME/namada-campfire/docker/container-build/namada-interface/Dockerfile $REPO_DIR/Dockerfile-interface
 #cp -f $REPO_DIR/docker/namadillo/Dockerfile $REPO_DIR/Dockerfile-interface # needs help with writing the config
