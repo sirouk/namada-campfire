@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 
 
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 echo "Updating nginx-full"
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 sudo apt -y update
 sudo apt -y upgrade nginx-full
 
 
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 echo "Obtaining SSL certificates for Namada Campfire structure"
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 
 
 # Prepare for domain
 if ! [[ $# -eq 1 && $1 == "-y" ]]; then
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   echo "This script assumes you have provisioned a domain name and pointed your DNS"
   echo "records for mainnet/faucet/api/rpc/interface subdomains to this server (wildcards work)"
   echo "and have run ./scripts/install-dependencies.sh script ahead of time."
   echo "Only proceed if you are sure you have this ready."
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -35,11 +35,11 @@ export TLD_NAME=$TLD_NAME
 
 # Prepare for firewall and 
 if ! [[ $# -eq 1 && $1 == "-y" ]]; then
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   echo "This script will attept to use UFW to open TCP ports 80 and 443, obtain an SSL, and"
-  echo "configure nginx for Campfire mainnet/faucet/api/rpc/interface subdomains on this server."
+  echo "configure nginx for mainnet/testnet/faucet/api/rpc/interface/explorer subdomains on this server."
   echo "Only proceed if you are sure you have this ready."
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
