@@ -2,8 +2,8 @@
 
 
 # Grab the repo
-rm -rf ~/namada-indexer
-cd ~
+rm -rf $HOME/namada-indexer
+cd $HOME
 git clone https://github.com/anoma/namada-indexer.git
 #git clone https://github.com/sirouk/namada-indexer.git
 cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull

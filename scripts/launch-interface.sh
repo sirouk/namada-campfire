@@ -8,7 +8,7 @@ INTERFACE_DIR="apps/namadillo"
 
 
 ### Grab the repo
-rm -rf ~/namada-interface
+rm -rf $HOME/namada-interface
 cd $HOME
 #git clone -b v0.1.0-0e77e71 https://github.com/anoma/namada-interface.git
 git clone https://github.com/anoma/$REPO_NAME.git
