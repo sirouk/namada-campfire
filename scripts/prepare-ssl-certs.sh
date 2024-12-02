@@ -17,7 +17,7 @@ echo "**************************************************************************
 if ! [[ $# -eq 1 && $1 == "-y" ]]; then
   echo "**************************************************************************************"
   echo "This script assumes you have provisioned a domain name and pointed your DNS"
-  echo "records for testnet/faucet/api/rpc/interface subdomains to this server (wildcards work)"
+  echo "records for mainnet/faucet/api/rpc/interface subdomains to this server (wildcards work)"
   echo "and have run ./scripts/install-dependencies.sh script ahead of time."
   echo "Only proceed if you are sure you have this ready."
   echo "**************************************************************************************"
@@ -37,7 +37,7 @@ export TLD_NAME=$TLD_NAME
 if ! [[ $# -eq 1 && $1 == "-y" ]]; then
   echo "**************************************************************************************"
   echo "This script will attept to use UFW to open TCP ports 80 and 443, obtain an SSL, and"
-  echo "configure nginx for Campfire testnet/faucet/api/rpc/interface subdomains on this server."
+  echo "configure nginx for Campfire mainnet/faucet/api/rpc/interface subdomains on this server."
   echo "Only proceed if you are sure you have this ready."
   echo "**************************************************************************************"
   read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
@@ -73,4 +73,4 @@ sudo systemctl reload nginx
 
 
 # Fetching the certificates
-sudo certbot --nginx -d $TLD_NAME -d testnet.$TLD_NAME -d faucet.$TLD_NAME -d api.faucet.$TLD_NAME -d rpc.$TLD_NAME -d interface.$TLD_NAME -d indexer.$TLD_NAME -d masp.$TLD_NAME -d explorer.$TLD_NAME --register-unsafely-without-email --agree-tos
+sudo certbot --nginx -d $TLD_NAME -d mainnet.$TLD_NAME -d faucet.$TLD_NAME -d api.faucet.$TLD_NAME -d rpc.$TLD_NAME -d interface.$TLD_NAME -d indexer.$TLD_NAME -d masp.$TLD_NAME -d explorer.$TLD_NAME --register-unsafely-without-email --agree-tos
