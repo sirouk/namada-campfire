@@ -17,23 +17,32 @@ echo "Syncing live data to temporary directory..."
 mkdir -p "$TEMP_DIR"
 mkdir -p "$TEMP_DIR/db"
 mkdir -p "$TEMP_DIR/cometbft/data"
-rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/db" "$TEMP_DIR/"
-rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data" "$TEMP_DIR/cometbft/"
+rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/db/" "$TEMP_DIR/db/"
+rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data/" "$TEMP_DIR/cometbft/data/"
 
-# Step 2: Create Snapshot from Temporary Directory
+# Step 2: Wait 30 seconds
+echo "Waiting 30 seconds to ensure files have stabilized..."
+sleep 30
+
+# Step 3: Fix Only Incomplete Files in Temporary Directory
+echo "Fixing incomplete files in the temporary directory..."
+rsync -av --existing --inplace "$CHAINDATA_PATH/$CHAIN_ID/db/" "$TEMP_DIR/db/"
+rsync -av --existing --inplace "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data/" "$TEMP_DIR/cometbft/data/"
+
+# Step 4: Create Snapshot from Temporary Directory
 echo "Creating snapshot..."
 sudo tar -C "$TEMP_DIR" -cf - db cometbft/data | lz4 - "$HOME/$SNAP_FILENAME"
 
-# Step 3: Update Snapshot Location
+# Step 5: Update Snapshot Location
 echo "Moving snapshot to web directory..."
 sudo rm -f "$HTML_PATH/*.tar.lz4"
 sudo mv -f "$HOME/$SNAP_FILENAME" "$HTML_PATH/$SNAP_FILENAME"
 
-# Step 4: Update HTML Index
+# Step 6: Update HTML Index
 echo "Updating snapshot link in HTML..."
-sudo sed -i.bak -e "s|Snapshot: <a href=\".*\">Download</a>|Snapshot: <a href=\"https://namada.$DOMAIN/$SNAP_FILENAME\">Download</a>|" "$HTML_PATH/index.html"
+sudo sed -i.bak -e "s|Snapshot: <a href=\".*\">Download</a>|Snapshot: <a href=\"https://$DOMAIN_PREFIX.$DOMAIN/$SNAP_FILENAME\">Download</a>|" "$HTML_PATH/index.html"
 
-# Step 5: Cleanup Temporary Directory
+# Step 7: Cleanup Temporary Directory
 echo "Cleaning up temporary files..."
 rm -rf "$TEMP_DIR"
 
