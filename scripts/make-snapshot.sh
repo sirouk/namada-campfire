@@ -17,8 +17,8 @@ echo "Syncing live data to temporary directory..."
 mkdir -p "$TEMP_DIR"
 mkdir -p "$TEMP_DIR/db"
 mkdir -p "$TEMP_DIR/cometbft/data"
-rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/db/" "$TEMP_DIR/db/"
-rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data/" "$TEMP_DIR/cometbft/data/"
+rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/db" "$TEMP_DIR/"
+rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data" "$TEMP_DIR/cometbft/"
 
 # Step 2: Create Snapshot from Temporary Directory
 echo "Creating snapshot..."
