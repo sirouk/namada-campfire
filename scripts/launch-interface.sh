@@ -27,7 +27,7 @@ cp -f $HOME/namada-campfire/docker/container-build/namada-interface/Dockerfile $
 export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
 export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
 
-export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/global-config.toml")
+export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/../global-config.toml")
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 export NAM=$(awk '/\[addresses\]/ {found=1} found && /nam = / {gsub(/.*= "/, ""); sub(/"$/, ""); print; exit}' "$CHAINDATA_PATH/$CHAIN_ID/wallet.toml")
 #export FAUCET_ADDRESS=$(awk '/\[addresses\]/ {found=1} found && /faucet-1 = / {gsub(/.*= "/, ""); sub(/"$/, ""); sub(/unencrypted:/, ""); print; exit}' "$CHAINDATA_PATH/$CHAIN_ID/wallet.toml")
