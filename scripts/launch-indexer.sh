@@ -14,7 +14,7 @@ git checkout tags/v1.0.1
 git pull
 
 # prep are vars
-export POSTGRES_PORT="5433"
+export POSTGRES_PORT="5432"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
 export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
 #export DATABASE_URL_TEST="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT"
