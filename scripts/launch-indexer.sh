@@ -9,12 +9,14 @@ git clone https://github.com/anoma/namada-indexer.git
 cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
 #cd $HOME/namada-indexer && git fetch --all && git checkout chore/update-namada-to-0.43.0 && git pull
 #cd $HOME/namada-indexer && git fetch --all && git checkout patch-2 && git pull
+git checkout tags/v1.0.1
 
 
 # prep are vars
 export POSTGRES_PORT="5433"
-export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/namada-indexer"
-export DATABASE_URL_TEST="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT"
+#export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
+export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
+#export DATABASE_URL_TEST="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 #export TENDERMINT_URL="http://127.0.0.1:27657"
 
@@ -24,8 +26,8 @@ export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); pri
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 
 
-export CACHE_URL="redis://dragonfly:6379"
-#export CACHE_URL="redis://redis@0.0.0.0:6379"
+#export CACHE_URL="redis://dragonfly:6379"
+export CACHE_URL="redis://redis@0.0.0.0:6379"
 export WEBSERVER_PORT="6000"
 export PORT="$WEBSERVER_PORT"
 
@@ -78,22 +80,27 @@ cd $HOME/namada-indexer
 docker compose -f docker-compose.yml down --volumes
 docker stop $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
-if [ -z "${LOGS_NOFOLLOW}" ]; then
-    echo "Removing namada-indexer images"
-    docker image rm --force $(docker image ls --all | grep -E '^namada/.*-indexer.*$' | awk '{print $3}')
-fi
-
-# prune all volumes (db data)
-docker volume prune -fa
 
 POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
 if [ -n "$POSTGRES_CONTAINER_ID" ]; then
     echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
     docker stop "$POSTGRES_CONTAINER_ID"
     docker rm "$POSTGRES_CONTAINER_ID"
+    # remove the postgres image
+    docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')    
 else
     echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
 fi
+
+if [ -z "${LOGS_NOFOLLOW}" ]; then
+    echo "Removing namada-indexer images"
+    docker image rm --force $(docker image ls --all | grep -E '^namada/.*-indexer.*$' | awk '{print $3}')
+    docker image rm --force $(docker image ls --all | grep '<none>' | awk '{print $3}')
+fi
+
+# prune all volumes (db data)
+docker volume prune -fa
+
 
 # build and start the containers
 #curl https://sh.rustup.rs -sSf | sh -s -- -y && source "$HOME/.cargo/env" -- -y

@@ -8,11 +8,12 @@ git clone https://github.com/anoma/namada-masp-indexer.git
 cd $HOME/namada-masp-indexer && git fetch --all && git checkout main && git pull
 
 # Copy the docker compose file: namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml
-#cp -f $HOME/namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml $HOME/namada-masp-indexer/docker-compose.yml
+cp -f $HOME/namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml $HOME/namada-masp-indexer/docker-compose.yml
 
 # prep vars
-export POSTGRES_PORT="5432"
-export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/masp_indexer_local"
+export POSTGRES_PORT="5433"
+#export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/masp_indexer_local"
+export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/masp_indexer_local"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 export COMETBFT_URL="$TENDERMINT_URL"
 
@@ -38,21 +39,24 @@ cd $HOME/namada-masp-indexer
 docker compose -f docker-compose.yml down --volumes
 docker stop $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
-if [ -z "${LOGS_NOFOLLOW}" ]; then
-    docker image rm --force $(docker image ls --all | grep 'namada-masp-' | awk '{print $3}')
-fi
-
-# prune all volumes (db data)
-docker volume prune -f
 
 POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
 if [ -n "$POSTGRES_CONTAINER_ID" ]; then
     echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
     docker stop "$POSTGRES_CONTAINER_ID"
     docker rm "$POSTGRES_CONTAINER_ID"
+    # remove the postgres image
+    docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')
 else
     echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
 fi
 
+if [ -z "${LOGS_NOFOLLOW}" ]; then
+    docker image rm --force $(docker image ls --all | grep 'namada-masp-' | awk '{print $3}')
+fi
+
+# prune all volumes (db data)
+docker volume prune -fa
+
 # start up
-docker compose -f $HOME/namada-masp-indexer/docker-compose.yml --env-file $HOME/namada-masp-indexer/.env up -d
+docker compose -f $HOME/namada-masp-indexer/docker-compose.yml --env-file $env_file up -d
