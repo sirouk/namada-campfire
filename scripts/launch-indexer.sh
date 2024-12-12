@@ -84,7 +84,7 @@ if [ -z "${LOGS_NOFOLLOW}" ]; then
 fi
 
 # prune all volumes (db data)
-docker volume prune -f
+docker volume prune -fa
 
 POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
 if [ -n "$POSTGRES_CONTAINER_ID" ]; then
