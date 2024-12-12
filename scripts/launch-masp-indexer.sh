@@ -8,24 +8,23 @@ git clone https://github.com/anoma/namada-masp-indexer.git
 cd $HOME/namada-masp-indexer && git fetch --all && git checkout main && git pull
 
 # Copy the docker compose file: namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml
-cp -f $HOME/namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml $HOME/namada-masp-indexer/docker-compose.yml
+#cp -f $HOME/namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml $HOME/namada-masp-indexer/docker-compose.yml
 
 # prep vars
-export POSTGRES_PORT="5433"
-export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/masp_indexer_local"
+#export POSTGRES_PORT="5433"
+#export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/masp_indexer_local"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/masp_indexer_local"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
-export COMETBFT_URL="$TENDERMINT_URL"
 
-export WEBSERVER_PORT="5000"
-export PORT="$WEBSERVER_PORT"
+#export WEBSERVER_PORT="5000"
+#export PORT="$WEBSERVER_PORT"
 
 # output vars to .env in root of namada-masp-indexer
 env_file="$HOME/namada-masp-indexer/.env"
 {
-    echo "DATABASE_URL=\"$DATABASE_URL\""
-    echo "COMETBFT_URL=\"$COMETBFT_URL\""
-    echo "PORT=\"$WEBSERVER_PORT\""
+    #echo "DATABASE_URL=\"$DATABASE_URL\""
+    echo "COMETBFT_URL=\"$TENDERMINT_URL\""
+    #echo "PORT=\"$WEBSERVER_PORT\""
     #echo "DATABASE_URL_TEST=\"$DATABASE_URL_TEST\""
 } > "$env_file"
 
