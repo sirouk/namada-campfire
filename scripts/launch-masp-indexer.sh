@@ -40,16 +40,16 @@ docker compose -f docker-compose.yml down --volumes
 docker stop $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
 
-POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
-if [ -n "$POSTGRES_CONTAINER_ID" ]; then
-    echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
-    docker stop "$POSTGRES_CONTAINER_ID"
-    docker rm "$POSTGRES_CONTAINER_ID"
-    # remove the postgres image
-    docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')
-else
-    echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
-fi
+# POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
+# if [ -n "$POSTGRES_CONTAINER_ID" ]; then
+#     echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
+#     docker stop "$POSTGRES_CONTAINER_ID"
+#     docker rm "$POSTGRES_CONTAINER_ID"
+#     # remove the postgres image
+#     docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')
+# else
+#     echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
+# fi
 
 if [ -z "${LOGS_NOFOLLOW}" ]; then
     docker image rm --force $(docker image ls --all | grep 'namada-masp-' | awk '{print $3}')

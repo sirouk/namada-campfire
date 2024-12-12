@@ -27,8 +27,8 @@ export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); pri
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 
 
-#export CACHE_URL="redis://dragonfly:6379"
-export CACHE_URL="redis://redis@0.0.0.0:6379"
+export CACHE_URL="redis://dragonfly:6379"
+#export CACHE_URL="redis://redis@0.0.0.0:6379"
 export WEBSERVER_PORT="6000"
 export PORT="$WEBSERVER_PORT"
 
@@ -82,16 +82,16 @@ docker compose -f docker-compose.yml down --volumes
 docker stop $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 
-POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
-if [ -n "$POSTGRES_CONTAINER_ID" ]; then
-    echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
-    docker stop "$POSTGRES_CONTAINER_ID"
-    docker rm "$POSTGRES_CONTAINER_ID"
-    # remove the postgres image
-    docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')    
-else
-    echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
-fi
+# POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
+# if [ -n "$POSTGRES_CONTAINER_ID" ]; then
+#     echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
+#     docker stop "$POSTGRES_CONTAINER_ID"
+#     docker rm "$POSTGRES_CONTAINER_ID"
+#     # remove the postgres image
+#     docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')    
+# else
+#     echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
+# fi
 
 if [ -z "${LOGS_NOFOLLOW}" ]; then
     echo "Removing namada-indexer images"
