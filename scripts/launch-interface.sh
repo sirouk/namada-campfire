@@ -14,7 +14,10 @@ cd $HOME
 git clone https://github.com/anoma/$REPO_NAME.git
 
 #cd $HOME/namada-interface && git checkout 1ed4d1285ffbf654c84a80353537023ba98e0614
-cd $REPO_DIR && git fetch --all && git checkout main && git pull
+cd $REPO_DIR && git fetch --all
+#git checkout main
+git checkout tags/v1.0.4
+git pull
 
 # test commit with chain phase ungating features
 #git checkout 930e124d2344e6c16e18428185a65c94283339a1

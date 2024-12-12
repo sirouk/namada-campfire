@@ -6,11 +6,12 @@ rm -rf $HOME/namada-indexer
 cd $HOME
 git clone https://github.com/anoma/namada-indexer.git
 #git clone https://github.com/sirouk/namada-indexer.git
-cd $HOME/namada-indexer && git fetch --all && git checkout main && git pull
+cd $HOME/namada-indexer && git fetch --all
+#git checkout main
 #cd $HOME/namada-indexer && git fetch --all && git checkout chore/update-namada-to-0.43.0 && git pull
 #cd $HOME/namada-indexer && git fetch --all && git checkout patch-2 && git pull
 git checkout tags/v1.0.1
-
+git pull
 
 # prep are vars
 export POSTGRES_PORT="5433"
