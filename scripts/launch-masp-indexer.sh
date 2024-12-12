@@ -12,8 +12,8 @@ cp -f $HOME/namada-campfire/docker/compose/docker-compose-namada-masp-indexer.ym
 
 # prep vars
 export POSTGRES_PORT="5432"
-#export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/masp_indexer_local"
-export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/masp_indexer_local"
+export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/masp_indexer_local"
+#export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/masp_indexer_local"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 export COMETBFT_URL="$TENDERMINT_URL"
 

@@ -16,7 +16,7 @@ git pull
 # prep are vars
 export POSTGRES_PORT="5432"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
-export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
+export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/namada-indexer"
 #export DATABASE_URL_TEST="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT"
 export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 #export TENDERMINT_URL="http://127.0.0.1:27657"
