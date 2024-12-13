@@ -5,7 +5,10 @@
 rm -rf $HOME/namada-masp-indexer
 cd $HOME
 git clone https://github.com/anoma/namada-masp-indexer.git
-cd $HOME/namada-masp-indexer && git fetch --all && git checkout main && git pull
+cd $HOME/namada-masp-indexer
+git fetch --all
+git checkout master
+git pull
 
 # Copy the docker compose file: namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml
 #cp -f $HOME/namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml $HOME/namada-masp-indexer/docker-compose.yml

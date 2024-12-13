@@ -10,7 +10,12 @@ cd $HOME/namada-indexer && git fetch --all
 #git checkout master
 #cd $HOME/namada-indexer && git fetch --all && git checkout chore/update-namada-to-0.43.0 && git pull
 #cd $HOME/namada-indexer && git fetch --all && git checkout patch-2 && git pull
-git checkout tags/v1.0.1
+#git checkout tags/v1.0.1
+
+# Get the latest tag
+LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+git checkout $LATEST_TAG
+git reset --hard $LATEST_TAG
 git pull
 
 # prep are vars
