@@ -74,3 +74,10 @@ sudo systemctl reload nginx
 
 # Fetching the certificates
 sudo certbot --nginx -d $TLD_NAME -d mainnet.$TLD_NAME -d testnet.$TLD_NAME -d faucet.$TLD_NAME -d api.faucet.$TLD_NAME -d rpc.$TLD_NAME -d interface.$TLD_NAME -d indexer.$TLD_NAME -d masp.$TLD_NAME -d explorer.$TLD_NAME --register-unsafely-without-email --agree-tos
+
+
+# update nginx to use http2 by editing the /etc/nginx/sites-available/default file
+sudo sed -i 's/listen 443 ssl;/listen 443 ssl http2;/g' /etc/nginx/sites-available/default
+
+# test config and reload if successful
+sudo nginx -t && sudo systemctl reload nginx
