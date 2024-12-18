@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Variables
-DOMAIN_PREFIX="namada"
+DOMAIN_PREFIX=${DOMAIN_PREFIX:-"namada"}
 HTML_PATH="/usr/share/nginx/html"
 DOMAIN=$(grep -oP "(?<=href=\"https://$DOMAIN_PREFIX.).*?(?=/)" "$HTML_PATH/index.html" | head -1)
 export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-2"
