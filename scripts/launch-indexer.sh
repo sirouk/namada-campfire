@@ -28,7 +28,7 @@ export TENDERMINT_URL=${TENDERMINT_URL:-"http://172.17.0.1:26657"}
 
 export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
 export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
-export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/../global-config.toml")
+export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/global-config.toml")
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 
 
@@ -64,11 +64,8 @@ env_file="$HOME/namada-indexer/.env"
 } > "$env_file"
 
 # copy checksums.json
-
-export CAMPFIRE_CHAINDATA=$HOME/chaindata/namada-1/$CHAIN_ID
-export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAINDATA}
-cp -f $CHAINDATA_PATH/wasm/checksums.json $HOME/namada-indexer/checksums.json
-echo "Copied $CHAINDATA_PATH/wasm/checksums.json"
+cp -f $CHAINDATA_PATH/$CHAIN_ID/wasm/checksums.json $HOME/namada-indexer/checksums.json
+echo "Copied $CHAINDATA_PATH/$CHAIN_ID/wasm/checksums.json"
 
 
 # # restart node with read_past_height_limit adjustment

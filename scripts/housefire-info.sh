@@ -18,7 +18,7 @@ source $HOME/housefire.env
 export BASE_DIR=${BASE_DIR:-$HOME/.local/share/namada}
 export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
 export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
-export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/../global-config.toml")
+export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/global-config.toml")
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 echo "Proceeding with CHAIN_ID: $CHAIN_ID"
 
@@ -51,4 +51,4 @@ sed -i "s#PEER#$PERSISTENT_PEERS#g" $HTML_PATH
 tar -czf /usr/share/nginx/html/wasm.tar.gz -C $HOME/.local/share/namada/$CHAIN_ID/ wasm
 
 # make the first snapshot
-DOMAIN_PREFIX="testnet.$CHAIN_PREFIX" CHAINDATA_PATH=$BASE_DIR/$CHAIN_ID $HOME/namada-campfire/scripts/make-snapshot.sh
+DOMAIN_PREFIX="testnet.$CHAIN_PREFIX" CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/make-snapshot.sh
