@@ -44,7 +44,7 @@ export NAM=$(awk '/\[addresses\]/ {found=1} found && /nam = / {gsub(/.*= "/, "")
 
 
 # Load Campfire vars in environment
-source $HOME/campfire.env
+source $HOME/*.env
 
 # write env file
 env_file="$REPO_DIR/$INTERFACE_DIR/.env"
