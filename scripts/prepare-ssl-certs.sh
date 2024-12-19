@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 
 
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 echo "Updating nginx-full"
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 sudo apt -y update
 sudo apt -y upgrade nginx-full
 
 
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 echo "Obtaining SSL certificates for Namada Campfire structure"
-echo "**************************************************************************************"
+echo "******************************************************************************************************"
 
 
 # Prepare for domain
 if ! [[ $# -eq 1 && $1 == "-y" ]]; then
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   echo "This script assumes you have provisioned a domain name and pointed your DNS"
-  echo "records for testnet/faucet/api/rpc/interface subdomains to this server (wildcards work)"
+  echo "records for mainnet/faucet/api/rpc/interface subdomains to this server (wildcards work)"
   echo "and have run ./scripts/install-dependencies.sh script ahead of time."
   echo "Only proceed if you are sure you have this ready."
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -35,11 +35,11 @@ export TLD_NAME=$TLD_NAME
 
 # Prepare for firewall and 
 if ! [[ $# -eq 1 && $1 == "-y" ]]; then
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   echo "This script will attept to use UFW to open TCP ports 80 and 443, obtain an SSL, and"
-  echo "configure nginx for Campfire testnet/faucet/api/rpc/interface subdomains on this server."
+  echo "configure nginx for mainnet/testnet/faucet/api/rpc/interface/explorer subdomains on this server."
   echo "Only proceed if you are sure you have this ready."
-  echo "**************************************************************************************"
+  echo "******************************************************************************************************"
   read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -66,11 +66,18 @@ sudo sed -i "s/TLD_NAME/$TLD_NAME/g" /etc/nginx/sites-available/default
 sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # test config
--sudo nginx -t
+sudo nginx -t
 
 # reload nginx
 sudo systemctl reload nginx
 
 
 # Fetching the certificates
-sudo certbot --nginx -d $TLD_NAME -d testnet.$TLD_NAME -d faucet.$TLD_NAME -d api.faucet.$TLD_NAME -d rpc.$TLD_NAME -d interface.$TLD_NAME -d indexer.$TLD_NAME -d explorer.$TLD_NAME --register-unsafely-without-email --agree-tos
+sudo certbot --nginx -d $TLD_NAME -d mainnet.$TLD_NAME -d testnet.$TLD_NAME -d faucet.$TLD_NAME -d api.faucet.$TLD_NAME -d rpc.$TLD_NAME -d interface.$TLD_NAME -d indexer.$TLD_NAME -d masp.$TLD_NAME -d explorer.$TLD_NAME --register-unsafely-without-email --agree-tos
+
+
+# update nginx to use http2 by editing the /etc/nginx/sites-available/default file
+sudo sed -i 's/listen 443 ssl;/listen 443 ssl http2;/g' /etc/nginx/sites-available/default
+
+# test config and reload if successful
+sudo nginx -t && sudo systemctl reload nginx
