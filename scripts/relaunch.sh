@@ -82,7 +82,7 @@ echo "Done"
 # purge all build cache
 docker builder prune -a
 # purge all volumes
-docker volume prune -f
+docker volume prune -fa
 
 
 
