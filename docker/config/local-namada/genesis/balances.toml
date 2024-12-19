@@ -11,7 +11,11 @@ tnam1qz4u7j7dkxj5wv9xuwy2qemaeeqd450ysgl7pq0r = "1000000000"
 [token.DOT]
 
 [token.Schnitzel]
+# added by Heliax: https://github.com/heliaxdev/namada-network-templates/blob/master/devnet/0.46.0/balances.toml
+tnam1qz4u7j7dkxj5wv9xuwy2qemaeeqd450ysgl7pq0r = "1000000000"
 
 [token.Apfel]
+# added by Heliax: https://github.com/heliaxdev/namada-network-templates/blob/master/devnet/0.46.0/balances.toml
+tnam1qz4u7j7dkxj5wv9xuwy2qemaeeqd450ysgl7pq0r = "1000000000"
 
 [token.Kartoffel]
