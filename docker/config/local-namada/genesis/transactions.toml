@@ -47,3 +47,9 @@ public_keys = ["tpknam1qzuagsc7j9spv39ry2p2557eshmxru7h86cae80jry7yejyne5c4umul7
 vp = "vp_user"
 threshold = 2
 public_keys = ["tpknam1qzmmumvf6hkfwuz4crjyt0eumg9557ykjh7w2ezgdxnuq36jddq82d9plcg", "tpknam1qzuvwwzxdchp8yz6xua9egckk59fhldhqv3fqff90vzj6lqu5wh2zxva0c2", "tpknam1qq6t0lqd77fja77l698crq9spdf444gdx8guucyjj4655dqdnfm5yzewmvh"]
+
+# default from heliaxdev/namada-network-templates/devnet/0.46.0
+[[established_account]]
+vp = "vp_user"
+threshold = 1
+public_keys = ["tpknam1qzvszv50azclqa05reqveehkwknpl4kh6tn3vajpt0vusa8mjpluk89ac03"]
