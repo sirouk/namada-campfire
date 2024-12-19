@@ -131,7 +131,7 @@ if [ $(hostname) = "namada-1" ]; then
 
     # add them to parameters.toml whitelist
     sed -i "s#tx_whitelist = \[\]#tx_whitelist = [$TX_CHECKSUMS]#" ~/.namada-shared/genesis/parameters.toml
-    sed -i "s#vp_whitelist = \[\]#vp_whitelist = [$VP_CHECKSUMS]#" ~/.namada-shared/genesis/parameters.toml
+    sed -i "s#vp_allowlist = \[\]#vp_allowlist = [$VP_CHECKSUMS]#" ~/.namada-shared/genesis/parameters.toml
 
     # add a random word to the chain prefix for human readability
     RANDOM_WORD=$(shuf -n 1 /root/words)
