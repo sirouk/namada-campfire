@@ -44,7 +44,7 @@ export NAM=$(awk '/\[addresses\]/ {found=1} found && /nam = / {gsub(/.*= "/, "")
 
 
 # Load Campfire vars in environment
-source $HOME/campfire.env
+source $HOME/*.env
 
 # write env file
 env_file="$REPO_DIR/$INTERFACE_DIR/.env"
@@ -52,7 +52,7 @@ env_file="$REPO_DIR/$INTERFACE_DIR/.env"
     echo "NODE_ENV=development"
     echo "NAMADA_INTERFACE_LOCAL=false"
 
-    echo "NAMADA_INTERFACE_NAMADA_ALIAS=Namada Dry Run"
+    echo "NAMADA_INTERFACE_NAMADA_ALIAS=\"Namadillo\""
     echo "NAMADA_INTERFACE_NAMADA_TOKEN=$NAM"
     echo "NAMADA_INTERFACE_NAMADA_CHAIN_ID=$CHAIN_ID"
     echo "NAMADA_INTERFACE_NAMADA_URL=https://rpc.$DOMAIN:443"
