@@ -26,7 +26,7 @@ echo "**************************************************************************
 echo "Stopping and removing:"
 
 
-namada_containers=("interface" "namada-indexer" "faucet-" "compose-namada-")
+namada_containers=("interface" "faucet" "namada-indexer" "namada-masp-indexer" "postgres" "redis" "compose-namada-")
 
 for container in "${namada_containers[@]}"; do
 
@@ -53,9 +53,9 @@ if ! [[ $# -eq 1 && $1 == "-y" ]]; then
   echo
   if [[ $REPLY =~ [Yy]$ ]]; then
     
-    namada_containers=("interface" "faucet-" "namada" "indexer")
+    namada_images=("interface" "faucet" "namada-indexer" "namada-masp-indexer" "postgres" "redis" "compose-namada")
 
-    for image in "${namada_containers[@]}"; do
+    for image in "${namada_images[@]}"; do
       image_ids=$(docker image ls --all | grep "$image" | awk '{print $3}')
       if [ -n "$image_ids" ]; then
         echo "Removing images: '$image'..."
@@ -64,7 +64,8 @@ if ! [[ $# -eq 1 && $1 == "-y" ]]; then
         echo "No image found matching: '$image'."
       fi
     done
-
+    # for the indexer
+    docker image rm --force $(docker image ls --all | grep -E '^namada/.*-indexer.*$' | awk '{print $3}')
   fi
 fi
 
@@ -78,6 +79,10 @@ echo "Done"
 
 
 
+# purge all build cache
+docker builder prune -a
+# purge all volumes
+docker volume prune -f
 
 
 
@@ -187,9 +192,9 @@ fi
 
 
 if ! [[ $# -eq 1 && $1 == "-y" ]]; then
-  echo "**************************************************************************************"
-  echo "The following steps would be to (re)launch the faucet, indexer, and interface!"
-  echo "**************************************************************************************"
+  echo "********************************************************************************************"
+  echo "The following steps would be to (re)launch the faucet, indexer, masp-indexer and interface!"
+  echo "********************************************************************************************"
   read -p "Would you like to execute these steps? (y/n) " -n 1 -r
   echo
   if [[ $REPLY =~ [Yy]$ ]]; then
@@ -199,8 +204,9 @@ if ! [[ $# -eq 1 && $1 == "-y" ]]; then
     $HOME/namada-campfire/scripts/launch-faucet-fe.sh
     
     # on housefire, relaunch these manually since they are updated frequently
-    # $HOME/namada-campfire/scripts/launch-indexer.sh
-    # $HOME/namada-campfire/scripts/launch-interface.sh
+    $HOME/namada-campfire/scripts/launch-indexer.sh
+    $HOME/namada-campfire/scripts/launch-masp-indexer.sh
+    $HOME/namada-campfire/scripts/launch-interface.sh
   fi
 fi
 
