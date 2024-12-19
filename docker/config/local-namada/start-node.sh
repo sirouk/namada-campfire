@@ -96,12 +96,13 @@ if [ $(hostname) = "namada-1" ]; then
       ['faucet-1', '$faucet_address',]
     ]" > /scripts/genesis_accounts.py
 
-    # create directory for genesis toml files
+    # cleanup and create directory for genesis toml files
+    rm -rf /root/.namada-shared/genesis
     mkdir -p /root/.namada-shared/genesis
-    cp /genesis/parameters.toml /root/.namada-shared/genesis/parameters.toml
-    cp /genesis/tokens.toml /root/.namada-shared/genesis/tokens.toml
-    cp /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
-    cp /genesis/transactions.toml /root/.namada-shared/genesis/transactions.toml
+    cp -f /genesis/parameters.toml /root/.namada-shared/genesis/parameters.toml
+    cp -f /genesis/tokens.toml /root/.namada-shared/genesis/tokens.toml
+    cp -f /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
+    cp -f /genesis/transactions.toml /root/.namada-shared/genesis/transactions.toml
 
     # add genesis transactions to transactions.toml
     # TODO: move to python script
