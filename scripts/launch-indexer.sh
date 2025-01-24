@@ -18,7 +18,11 @@ git checkout $LATEST_TAG
 git reset --hard $LATEST_TAG
 git pull
 
+# git checkout fix-transparent-tx-kind
+# git pull
+
 # prep are vars
+export WIPE_DB=true
 export POSTGRES_PORT="5433"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
 export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/namada-indexer"
@@ -84,16 +88,20 @@ docker compose -f docker-compose.yml down --volumes
 docker stop $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 
-# POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
-# if [ -n "$POSTGRES_CONTAINER_ID" ]; then
-#     echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
-#     docker stop "$POSTGRES_CONTAINER_ID"
-#     docker rm "$POSTGRES_CONTAINER_ID"
-#     # remove the postgres image
-#     docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')    
-# else
-#     echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
-# fi
+# remove the postgres container if variable $WIPE_DB is set to true
+if [ -n "$WIPE_DB" ]; then
+    echo "Wiping the database..."
+    POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
+    if [ -n "$POSTGRES_CONTAINER_ID" ]; then
+        echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
+        docker stop "$POSTGRES_CONTAINER_ID"
+        docker rm "$POSTGRES_CONTAINER_ID"
+        # remove the postgres image
+        docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')    
+    else
+        echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
+    fi
+fi
 
 if [ -z "${LOGS_NOFOLLOW}" ]; then
     echo "Removing namada-indexer images"
