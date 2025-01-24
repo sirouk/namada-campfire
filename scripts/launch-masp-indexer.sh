@@ -7,7 +7,13 @@ cd $HOME
 git clone https://github.com/anoma/namada-masp-indexer.git
 cd $HOME/namada-masp-indexer
 git fetch --all
-git checkout master
+#git checkout master
+#git pull
+
+# Get the latest tag
+LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+git checkout $LATEST_TAG
+git reset --hard $LATEST_TAG
 git pull
 
 # Copy the docker compose file: namada-campfire/docker/compose/docker-compose-namada-masp-indexer.yml
@@ -42,16 +48,16 @@ docker compose -f docker-compose.yml down --volumes
 docker stop $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'namada-masp-' | awk '{print $1}')
 
-# POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
-# if [ -n "$POSTGRES_CONTAINER_ID" ]; then
-#     echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
-#     docker stop "$POSTGRES_CONTAINER_ID"
-#     docker rm "$POSTGRES_CONTAINER_ID"
-#     # remove the postgres image
-#     docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')
-# else
-#     echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
-# fi
+POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
+if [ -n "$POSTGRES_CONTAINER_ID" ]; then
+    echo "Stopping and removing 'postgres' container running on port ${POSTGRES_PORT}..."
+    docker stop "$POSTGRES_CONTAINER_ID"
+    docker rm "$POSTGRES_CONTAINER_ID"
+    # remove the postgres image
+    docker image rm --force $(docker image ls --all | grep -E '^postgres.*$' | awk '{print $3}')
+else
+    echo "No 'postgres' container found running on port ${POSTGRES_PORT} (GOOD)"
+fi
 
 if [ -z "${LOGS_NOFOLLOW}" ]; then
     docker image rm --force $(docker image ls --all | grep 'namada-masp-' | awk '{print $3}')
