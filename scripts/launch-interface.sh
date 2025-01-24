@@ -24,7 +24,7 @@ git checkout $LATEST_TAG
 git reset --hard $LATEST_TAG
 git pull
 
-git pull
+#git checkout main
 
 # test commit with chain phase ungating features
 #git checkout 930e124d2344e6c16e18428185a65c94283339a1
@@ -55,14 +55,20 @@ env_file="$REPO_DIR/$INTERFACE_DIR/.env"
     echo "NAMADA_INTERFACE_NAMADA_ALIAS=\"Namadillo\""
     echo "NAMADA_INTERFACE_NAMADA_TOKEN=$NAM"
     echo "NAMADA_INTERFACE_NAMADA_CHAIN_ID=$CHAIN_ID"
-    echo "NAMADA_INTERFACE_NAMADA_URL=https://rpc.$DOMAIN:443"
-    echo "RPC_URL=https://rpc.$DOMAIN:443" # used for bootstrap_config.sh
+    #echo "NAMADA_INTERFACE_NAMADA_URL=https://rpc.$DOMAIN:443"
+    echo "NAMADA_INTERFACE_NAMADA_URL=https://namada-rpc.tududes.com:443"
+    #echo "RPC_URL=https://rpc.$DOMAIN:443" # used for bootstrap_config.sh
+    echo "RPC_URL=https://namada-rpc.tududes.com:443" # used for bootstrap_config.sh
     
     echo "NAMADA_INTERFACE_NAMADA_BECH32_PREFIX=tnam"
     echo "NAMADA_INTERFACE_INDEXER_URL=https://indexer.$DOMAIN:443"
+    #echo "NAMADA_INTERFACE_INDEXER_URL=https://namada-idx.emberstake.xyz:443"
     echo "INDEXER_URL=https://indexer.$DOMAIN:443" # used for bootstrap_config.sh
+    #echo "INDEXER_URL=https://namada-idx.emberstake.xyz:443" # used for bootstrap_config.sh
 
     echo "MASP_INDEXER_URL=https://masp.$DOMAIN:443" # used for bootstrap_config.sh
+    #echo "MASP_INDEXER_URL=https://namada-masp-idx.emberstake.xyz:443" # used for bootstrap_config.sh
+
 
     # echo "REACT_APP_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
     # echo "NAMADA_INTERFACE_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
@@ -81,6 +87,7 @@ config_file="$REPO_DIR/$INTERFACE_DIR/public/config.toml"
     echo "indexer_url = https://indexer.$DOMAIN:443"
     echo "rpc_url = https://rpc.$DOMAIN:443"
     echo "masp_indexer_url = https://masp.$DOMAIN:443"
+    #echo "masp_indexer_url = https://namada-masp-idx.emberstake.xyz:443"
 } > "$config_file"
 
 
