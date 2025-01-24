@@ -89,7 +89,7 @@ docker stop $(docker container ls --all | grep 'namada-indexer' | awk '{print $1
 docker container rm --force $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 
 # remove the postgres container if variable $WIPE_DB is set to true
-if [ -n "$WIPE_DB" ]; then
+if [ "$WIPE_DB" = true ]; then
     echo "Wiping the database..."
     POSTGRES_CONTAINER_ID=$(docker ps --filter "name=postgres" --filter "publish=${POSTGRES_PORT}" --format "{{.ID}}")
     if [ -n "$POSTGRES_CONTAINER_ID" ]; then
