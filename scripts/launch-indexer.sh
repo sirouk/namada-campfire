@@ -22,7 +22,7 @@ git pull
 # git pull
 
 # prep are vars
-export WIPE_DB=true
+export WIPE_DB=${WIPE_DB:-false}
 export POSTGRES_PORT="5433"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
 export DATABASE_URL="postgres://postgres:password@postgres:$POSTGRES_PORT/namada-indexer"
