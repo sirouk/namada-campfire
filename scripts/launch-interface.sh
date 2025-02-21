@@ -25,6 +25,7 @@ git reset --hard $LATEST_TAG
 git pull
 
 #git checkout main
+#git reset --hard main
 
 # test commit with chain phase ungating features
 #git checkout 930e124d2344e6c16e18428185a65c94283339a1
