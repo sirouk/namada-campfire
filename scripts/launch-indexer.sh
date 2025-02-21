@@ -20,6 +20,8 @@ git pull
 
 # git checkout fix-transparent-tx-kind
 # git pull
+# git checkout tags/v1.1.6
+# git pull
 
 # prep are vars
 export WIPE_DB=${WIPE_DB:-false}
