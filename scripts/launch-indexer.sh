@@ -106,15 +106,14 @@ if [ "$WIPE_DB" = true ]; then
         echo "Removing namada-indexer images"
         docker image rm --force $(docker image ls --all | grep -E '^namada/.*-indexer.*$' | awk '{print $3}')
         docker image rm --force $(docker image ls --all | grep '<none>' | awk '{print $3}')
+
+        # prune all volumes (db data)
+        docker volume prune -fa
     else
         echo "Not wiping the database..."
         docker compose -f docker-compose.yml down
 
 fi
-
-
-# prune all volumes (db data)
-docker volume prune -fa
 
 
 # build and start the containers
