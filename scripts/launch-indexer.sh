@@ -24,7 +24,7 @@ git pull
 # git pull
 
 # Copy the docker compose file for the db
-cp $HOME/namada-campfire/docker/compose/docker-compose-db.yml $HOME/namada-indexer/docker-compose-db.yml
+cp -f $HOME/namada-campfire/docker/compose/docker-compose-db.yml $HOME/namada-indexer/docker-compose-db.yml
 
 # prep are vars
 export WIPE_DB=${WIPE_DB:-false}
