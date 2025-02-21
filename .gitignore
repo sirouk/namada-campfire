@@ -1,1 +1,2 @@
 docker/config/local-namada/genesis/parameters.old
+*.log
