@@ -35,7 +35,7 @@ sudo tar -C "$TEMP_DIR" -cf - db cometbft/data | lz4 - "$HOME/$SNAP_FILENAME"
 
 # Step 5: Update Snapshot Location
 echo "Moving snapshot to web directory..."
-sudo rm -f "$HTML_PATH/*.lz4"
+sudo rm -f $HTML_PATH/$CHAIN_ID*.lz4
 sudo mv -f "$HOME/$SNAP_FILENAME" "$HTML_PATH/$SNAP_FILENAME"
 
 # Step 6: Update HTML Index
