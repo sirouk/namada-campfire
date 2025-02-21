@@ -23,6 +23,10 @@ git pull
 # git checkout tags/v1.1.6
 # git pull
 
+# Copy the docker compose file for the db
+cp $HOME/namada-campfire/docker/compose/docker-compose-db.yml $HOME/namada-indexer/docker-compose-db.yml
+
+
 # prep are vars
 export WIPE_DB=${WIPE_DB:-false}
 export POSTGRES_PORT="5433"
