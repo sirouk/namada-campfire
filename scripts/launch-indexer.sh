@@ -23,9 +23,6 @@ git pull
 # git checkout tags/v1.1.6
 # git pull
 
-# Copy the docker compose file for the db
-cp -f $HOME/namada-campfire/docker/compose/docker-compose-db.yml $HOME/namada-indexer/docker-compose-db.yml
-
 # prep are vars
 export POSTGRES_PORT="5433"
 #export DATABASE_URL="postgres://postgres:password@0.0.0.0:$POSTGRES_PORT/namada-indexer"
@@ -106,6 +103,9 @@ docker image rm --force $(docker image ls --all | grep '<none>' | awk '{print $3
 
 # prune all volumes (db data)
 docker volume prune -fa
+
+# Copy the docker compose file for the db
+cp -f $HOME/namada-campfire/docker/compose/docker-compose-db.yml $HOME/namada-indexer/docker-compose-db.yml
 
 # build and start the containers
 #curl https://sh.rustup.rs -sSf | sh -s -- -y && source "$HOME/.cargo/env" -- -y
