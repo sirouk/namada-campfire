@@ -1,25 +1,25 @@
-# Namada "Campfire" Testnet Hosting Resources
+# Namada "Campfire" Testnet Hosting & Resources
 
 
 ## Quick Start Guide
 
 
 ### Fork Repo in your GitHub org (already done below)
-Visit: https://github.com/vknowable/namada-campfire
+Visit (this): https://github.com/sirouk/namada-campfire
+Original (upstream): https://github.com/vknowable/namada-campfire
 
 
 ### Set Repo Org
 ```bash
-export GITORG=knowable
-cd ~
-rm -rf ~/namada-campfire
+export GITORG=sirouk
+cd $HOME
+rm -rf $HOME/namada-campfire
 git clone https://github.com/$GITORG/namada-campfire
 ```
 
 ### Install Dependencies (docker/nginx-full/certbot)
 ```bash
-cd ~/namada-campfire
-./scripts/install-dependencies.sh
+$HOME/namada-campfire/scripts/install-dependencies.sh
 # reconnect to SSH to activate docker group
 ```
 
@@ -28,8 +28,7 @@ NOTE: perhaps subdomain and subdomain wildcard DNS entries to make this easy
 
 ```bash
 ### Prepare SSL Certs
-cd ~/namada-campfire
-./scripts/prepare-ssl-certs.sh
+$HOME/namada-campfire/scripts/prepare-ssl-certs.sh
 ```
 
 ### Fetch Namada release tag for Campfire
@@ -39,15 +38,14 @@ Visit: https://github.com/anoma/namada/releases
 
 ### Prepare Campfire config
 ```bash
-cp ~/namada-campfire/config/campfire.env ~/campfire.env
-nano ~/campfire.env
+cp $HOME/namada-campfire/config/campfire.env $HOME/campfire.env
+nano $HOME/campfire.env
 # edit the file and update with chain values
 ```
 
 ### Start Campfire devnet
 ```bash
-cd ~/namada-campfire
-./scripts/relaunch.sh
+$HOME/namada-campfire/scripts/relaunch.sh
 ```
 
 You will be presented with the option to launch all Namada Campfire components like so:
@@ -68,41 +66,31 @@ But here they are for your reference!
 
 ### Start Faucet backend
 ```bash
-cd ~/namada-campfire
-./scripts/launch-faucet-be.sh
-
-# watch faucet-be logs
-clear; docker logs -f $(docker container ls --all | grep faucet-fe | awk '{print $1}')
+$HOME/namada-campfire/scripts/launch-faucet-be.sh
 ```
 
 
 ### Start Faucet frontend
 ```bash
-cd ~/namada-campfire
-./scripts/launch-faucet-fe.sh
-
-# watch faucet-fe logs
-clear; docker logs -f $(docker container ls --all | grep faucet-fe | awk '{print $1}')
-````
+$HOME/namada-campfire/scripts/launch-faucet-fe.sh
+```
 
 
 ### Start Indexer
 ```bash
-cd ~/namada-campfire
-./scripts/launch-indexer.sh
+WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 TENDERMINT_URL="http://172.17.0.1:26657" $HOME/namada-campfire/scripts/launch-indexer.sh
+```
 
-# watch faucet-fe logs
-clear; docker logs -f $(docker container ls --all | grep interface | awk '{print $1}')
+
+### Start MASP Indexer
+```bash
+CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-masp-indexer.sh
 ```
 
 
 ### Start Interface
 ```bash
-cd ~/namada-campfire
-./scripts/launch-interface.sh
-
-# watch faucet-fe logs
-clear; docker logs -f $(docker container ls --all | grep interface | awk '{print $1}')
+CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-interface.sh
 ```
 
 
@@ -110,10 +98,10 @@ clear; docker logs -f $(docker container ls --all | grep interface | awk '{print
 
 > ⚠️ CONTAINER CLEANUP: stops and deletes containers
 
-### interface
+### faucet-be and faucet-fe
 ```bash
-docker container stop $(docker container ls --all | grep 'interface' | awk '{print $1}')
-docker container rm --force $(docker container ls --all | grep 'interface' | awk '{print $1}')
+docker container stop $(docker container ls --all | grep 'faucet-' | awk '{print $1}')
+docker container rm --force $(docker container ls --all | grep 'faucet-' | awk '{print $1}')
 ```
 
 ### indexer
@@ -122,13 +110,19 @@ docker container stop $(docker container ls --all | grep 'namada-indexer' | awk 
 docker container rm --force $(docker container ls --all | grep 'namada-indexer' | awk '{print $1}')
 ```
 
-### faucet-be and faucet-fe
+### masp-indexer
 ```bash
-docker container stop $(docker container ls --all | grep 'faucet-' | awk '{print $1}')
-docker container rm --force $(docker container ls --all | grep 'faucet-' | awk '{print $1}')
+docker container stop $(docker container ls --all | grep 'masp-indexer' | awk '{print $1}')
+docker container rm --force $(docker container ls --all | grep 'masp-indexer' | awk '{print $1}')
 ```
 
-### namada
+### interface
+```bash
+docker container stop $(docker container ls --all | grep 'interface' | awk '{print $1}')
+docker container rm --force $(docker container ls --all | grep 'interface' | awk '{print $1}')
+```
+
+### namada nodes
 ```bash
 docker container stop $(docker container ls --all | grep 'compose-namada-' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'compose-namada-' | awk '{print $1}')
@@ -137,12 +131,16 @@ docker container rm --force $(docker container ls --all | grep 'compose-namada-'
 
 > ⚠️ IMAGE CLEANUP: deletes images
 ```bash
-# namada
-docker image rm --force $(docker image ls --all | grep 'namada' | awk '{print $3}')
-# faucet
+# faucet-be and faucet-fe
 docker image rm --force $(docker image ls --all | grep 'faucet-' | awk '{print $3}')
 # interface
 docker image rm --force $(docker image ls --all | grep 'interface' | awk '{print $3}')
+# indexer
+docker image rm --force $(docker image ls --all | grep 'namada-indexer' | awk '{print $3}')
+# masp-indexer
+docker image rm --force $(docker image ls --all | grep 'masp-indexer' | awk '{print $3}')
+# namada
+docker image rm --force $(docker image ls --all | grep 'compose-namada' | awk '{print $3}')
 ```
 
 
@@ -194,14 +192,14 @@ You can launch the chain by running the script `scripts/relaunch.sh`, or by foll
 ```
 # first set this to specify which container image to use, ie: namada:${NAMADA_TAG}
 export NAMADA_TAG=v0.35.1
-docker compose -f ~/namada-campfire/docker/compose/docker-compose-local-namada.yml --env-file ~/campfire.env up -d
+docker compose -f $HOME/namada-campfire/docker/compose/docker-compose-local-namada.yml --env-file $HOME/campfire.env up -d
 ```
-3. After the chain has started, you can obtain the chain-id, faucet private-key and NAM token address (both found in the wallet.toml of the namada-1 node `~/chaindata/namada-1/$CHAIN_ID/wallet.toml`). You can now start the faucet backend:  
-`docker run --name faucet-be -d -p "5000:5000" faucet-be:local ./server --cargo-env development --difficulty 3 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port 5000 --rps 10  --rpc http://172.17.0.1:26657`  
+3. After the chain has started, you can obtain the chain-id, faucet private-key and NAM token address (both found in the wallet.toml of the namada-1 node `$HOME/chaindata/namada-1/$CHAIN_ID/wallet.toml`). You can now start the faucet backend:  
+`docker run --name faucet-be -d -p "5001:5000" faucet-be:local ./server --cargo-env development --difficulty 3 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port 5001 --rps 10  --rpc http://172.17.0.1:26657`  
 and frontend:  
 `docker run --name faucet-fe -d -p "4000:80" faucet-fe:local`  
 
-(Note: the NAM token address is assumed to be `tnam1q87wtaqqtlwkw927gaff34hgda36huk0kgry692a` but if yours if different for some reason, you will have to update the faucet-frontend env file `~/namada-interface/apps/faucet/.env` with the new value and rebuild the frontend container to incorporate the changes.)  
+(Note: the NAM token address is assumed to be `tnam1q87wtaqqtlwkw927gaff34hgda36huk0kgry692a` but if yours if different for some reason, you will have to update the faucet-frontend env file `$HOME/namada-interface/apps/faucet/.env` with the new value and rebuild the frontend container to incorporate the changes.)  
 
 You can test that everything is working by creating a test address and requesting some tokens from the faucet:  
 ```
@@ -219,8 +217,8 @@ namadac balance --owner test
 You can re-launch the chain by running the script `scripts/relaunch.sh`, or follow these steps to stop the chain, wipe all chain data, and re-launch with a different version of Namada:  
 
 1. Build the container image for the new version of Namada (this can be done while the old chain is still running, to minimize downtime). There shouldn't be any need to rebuild the faucet frontend or backend containers in most cases.
-2. Stop the chain: `docker compose -f ~/namada-campfire/docker/compose/docker-compose-local-namada.yml --env-file ~/campfire.env down --volumes`
-3. Delete the old chain data from disk: `sudo rm -rf ~/chaindata`
+2. Stop the chain: `docker compose -f $HOME/namada-campfire/docker/compose/docker-compose-local-namada.yml --env-file $HOME/campfire.env down --volumes`
+3. Delete the old chain data from disk: `sudo rm -rf $HOME/chaindata`
 4. Stop and remove the two faucet containers: `docker stop faucet-fe faucet-be && docker rm faucet-fe faucet-be`
 5. Build the container image for the new version of Namada. There shouldn't be any need to rebuild the faucet frontend or backend containers in most cases.
 6. Relaunch the chain according to the steps in **Starting the chain**.  
