@@ -94,7 +94,8 @@ if [ -n "${LOGS_NOFOLLOW}" ]; then
     docker image rm --force $(docker image ls --all | grep 'interface' | awk '{print $3}')
 fi
 
-docker build -f $REPO_DIR/Dockerfile-interface --build-arg INDEXER_URL="$INDEXER_URL" --build-arg RPC_URL="$RPC_URL" --build-arg MASP_INDEXER_URL="$MASP_INDEXER_URL" -t interface:local $REPO_DIR
+#docker build -f $REPO_DIR/Dockerfile-interface --build-arg INDEXER_URL="$INDEXER_URL" --build-arg RPC_URL="$RPC_URL" --build-arg MASP_INDEXER_URL="$MASP_INDEXER_URL" -t interface:local $REPO_DIR
+docker build -f $REPO_DIR/Dockerfile-interface --build-arg INDEXER_URL="$INDEXER_URL" --build-arg RPC_URL="$RPC_URL" --build-arg MASP_INDEXER_URL="$MASP_INDEXER_URL" -t interface:local $REPO_DIR --no-cache
 
 docker stop $(docker container ls --all | grep 'interface' | awk '{print $1}')
 docker container rm --force $(docker container ls --all | grep 'interface' | awk '{print $1}')
