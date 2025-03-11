@@ -17,7 +17,7 @@ git checkout $LATEST_TAG
 git reset --hard $LATEST_TAG
 git pull
 
-git checkout tags/v2.1.0
+git checkout tags/v2.3.0
 
 #git checkout fix-transparent-tx-kind
 #git pull
