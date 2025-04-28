@@ -1,93 +1,117 @@
-include:
-  - docker-compose-db.yml
-
+x-defaults: &defaults
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+    dragonfly:
+      condition: service_healthy
+  build: &build
+    context: .
+    dockerfile: Dockerfile
+  environment: &env-vars
+    DATABASE_URL: ${DATABASE_URL:-postgres://postgres:${POSTGRES_PASSWORD:-}@postgres:5432/namada-indexer}
+    TENDERMINT_URL: ${TENDERMINT_URL}
+    CACHE_URL: ${CACHE_URL:-redis://dragonfly:6379}
+  command: |
+    ./service
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
 services:
-  chain:
-    restart: on-failure
-    depends_on:
-      - postgres
-#    image: ghcr.io/anoma/namada-indexer:chain-main
-    image: namada/chain-indexer
-    build:
-      context: .
-      dockerfile: chain/Dockerfile
+  postgres:
+    image: postgres:16-alpine
+    command: ["postgres", "-c", "max_connections=200"]
+    expose:
+      - "5432"
     environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/namada-indexer
-      TENDERMINT_URL: http://172.17.0.1:26657
-      CHAIN_ID: housefire-donor.4fb58546bff725
-      INITIAL_QUERY_RETRY_TIME: 60
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+      POSTGRES_DB: namada-indexer
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d namada-indexer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    command: --logtostderr --cache_mode=true --port 6379 -dbnum 1
+    ulimits:
+      memlock: -1
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  chain:
+    !!merge <<: *defaults
+    image: namada/chain-indexer
+    environment:
+      !!merge <<: *env-vars
+      INITIAL_QUERY_RETRY_TIME: ${INITIAL_QUERY_RETRY_TIME:-15}
       CHECKSUMS_FILE: checksums.json
-
+    build:
+      !!merge <<: *build
+      args:
+        PACKAGE: chain
   governance:
-    restart: on-failure
-    depends_on:
-      - postgres
-#    image: ghcr.io/anoma/namada-indexer:governance-main
+    !!merge <<: *defaults
     image: namada/governance-indexer
     build:
-      context: .
-      dockerfile: governance/Dockerfile
-    environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/namada-indexer
-      TENDERMINT_URL: http://172.17.0.1:26657
-
+      !!merge <<: *build
+      args:
+        PACKAGE: governance
   pos:
-#    image: ghcr.io/anoma/namada-indexer:pos-main
+    !!merge <<: *defaults
     image: namada/pos-indexer
-    restart: on-failure
-    depends_on:
-      - postgres
     build:
-      context: .
-      dockerfile: pos/Dockerfile
-    environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/namada-indexer
-      TENDERMINT_URL: http://172.17.0.1:26657
-
+      !!merge <<: *build
+      args:
+        PACKAGE: pos
   rewards:
-#    image: ghcr.io/anoma/namada-indexer:rewards-main
+    !!merge <<: *defaults
     image: namada/rewards-indexer
-    restart: on-failure
-    depends_on:
-      - postgres
     build:
-      context: .
-      dockerfile: rewards/Dockerfile
-    environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/namada-indexer
-      TENDERMINT_URL: http://172.17.0.1:26657
-
+      !!merge <<: *build
+      args:
+        PACKAGE: rewards
   parameters:
+    !!merge <<: *defaults
     image: namada/parameters-indexer
-    restart: on-failure
-    depends_on:
-      - postgres
     build:
-      context: .
-      dockerfile: parameters/Dockerfile
-    environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/namada-indexer
-      TENDERMINT_URL: http://172.17.0.1:26657
-
+      !!merge <<: *build
+      args:
+        PACKAGE: parameters
+  transactions:
+    !!merge <<: *defaults
+    image: namada/transaction-indexer
+    build:
+      !!merge <<: *build
+      args:
+        PACKAGE: transactions
   webserver:
-#    image: ghcr.io/anoma/namada-indexer:webserver-main
+    !!merge <<: *defaults
     image: namada/webserver-indexer
-    restart: on-failure
-    depends_on:
-      - postgres
-      - dragonfly
     build:
-      context: .
-      dockerfile: webserver/Dockerfile
+      !!merge <<: *build
+      args:
+        PACKAGE: webserver
+    expose:
+      - 5001
     ports:
-      - 6000:5000
+      - ${WEBSERVER_HOST_IP:-127.0.0.1}:${WEBSERVER_PORT:-5001}:5001
     environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/namada-indexer
-      CACHE_URL: redis://dragonfly:6379
-      TENDERMINT_URL: http://172.17.0.1:26657
+      !!merge <<: *env-vars
     healthcheck:
-      test: curl --fail http://localhost:5000/health || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+      test: curl --fail http://localhost:5001/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+volumes:
+  postgres_data:
