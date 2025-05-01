@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-# Example Mainnet or Housefire:
-# 
+# Examples for Mainnet or Housefire:
+# unset BRANCH; BUILD_ONLY=false WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-indexer.sh && docker logs -f --tail 100 namada-indexer-transactions-1
 
 # BUILD_ONLY=false BRANCH=grarco/update-masp-events-rebased+fix WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-indexer.sh && docker logs -f --tail 100 namada-indexer-transactions-1
+
 # Example Campfire:
 # BUILD_ONLY=false BRANCH=grarco/update-masp-events-rebased+fix WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 TENDERMINT_URL="http://172.17.0.1:26657" $HOME/namada-campfire/scripts/launch-indexer.sh && docker logs -f --tail 100 namada-indexer-transactions-1
+
 
 # Set BUILD_ONLY flag (defaults to true)
 export BUILD_ONLY=${BUILD_ONLY:-true}
