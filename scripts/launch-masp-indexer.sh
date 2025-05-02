@@ -14,7 +14,7 @@
   # unset BRANCH; WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
 
   # use branch:
-  # BUILD_ONLY=false BRANCH=tiago/housefire-indexer-1.3.x WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
+  # BUILD_ONLY=false BRANCH=tiago/housefire-indexer-1.3.x WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1 
 
 
 # Set BUILD_ONLY flag (defaults to true)
