@@ -18,8 +18,7 @@
 
 # Set default values for environment variables
 export BUILD_ONLY=${BUILD_ONLY:-false}
-export BRANCH=${BRANCH:-""}
-export TAG=${TAG:-""}
+export BRANCH=${BRANCH:-false}
 export WIPE_DB=${WIPE_DB:-false}
 export POSTGRES_PORT="5432"
 export POSTGRES_PASSWORD="password"
@@ -49,15 +48,11 @@ LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
 echo "Latest tag is: $LATEST_TAG"
 
 # Checkout branch, tag, or specific version based on parameters
-if [ -n "$BRANCH" ]; then
+if [ "$BRANCH" != false ]; then
   # Use the specified branch
   echo "Using specified branch: $BRANCH"
   git checkout $BRANCH
   git pull
-elif [ -n "$TAG" ]; then
-  # Use the specified tag
-  echo "Using specified tag: $TAG"
-  git checkout tags/$TAG
 else
   # Use latest tag if no branch or tag specified
   echo "No branch or tag specified, using latest tag: $LATEST_TAG"
@@ -142,10 +137,3 @@ else
   # Build and start the containers
   docker compose -f $HOME/namada-indexer/docker-compose.yml --env-file $env_file up -d
 fi
-
-# Provide helpful commands for checking logs
-echo ""
-echo "To check logs, run one of these commands:"
-echo "docker logs -f namada-indexer-chain-1"
-echo "docker logs -f namada-indexer-transactions-1"
-echo "docker logs -f namada-indexer-webserver-1"
