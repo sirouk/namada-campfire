@@ -1,9 +1,21 @@
 #!/usr/bin/env bash
 
-# Example Mainnet or Housefire:
-# BUILD_ONLY=false BRANCH=tiago/housefire-indexer-1.3.x WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f namada-masp-indexer-1 --tail
+# Examples for Mainnet or Housefire:
+
+  # use latest tag:
+  # unset BRANCH; BUILD_ONLY=false WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
+
+  # use branch:
+  # BUILD_ONLY=false BRANCH=tiago/housefire-indexer-1.3.x WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
+
 # Example Campfire:
-# WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 TENDERMINT_URL="http://172.17.0.1:26657" $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f namada-masp-indexer-1 --tail 100
+
+  # use latest tag:
+  # unset BRANCH; WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
+
+  # use branch:
+  # BUILD_ONLY=false BRANCH=tiago/housefire-indexer-1.3.x WIPE_DB=false CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
+
 
 # Set BUILD_ONLY flag (defaults to true)
 export BUILD_ONLY=${BUILD_ONLY:-true}
