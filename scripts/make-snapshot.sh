@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# This script will stop the namada-2 node, create a snapshot using it's db contents, and restart the node
+
+# Example for crontab:
+# 0 */6 * * * RUN_MODE=docker DOMAIN_PREFIX=testnet.campfire /root/namada-campfire/scripts/make-snapshot.sh >> /root/namada-campfire/scripts/make-snapshot.sh.log 2>&1
+# or 
+# 0 */6 * * * RUN_MODE=service DOMAIN_PREFIX=testnet.campfire /root/namada-campfire/scripts/make-snapshot.sh >> /root/namada-campfire/scripts/make-snapshot.sh.log 2>&1
+
 # Variables
 DOMAIN_PREFIX=${DOMAIN_PREFIX:-"namada"}
 HTML_PATH="/usr/share/nginx/html"
@@ -10,40 +17,50 @@ export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); pri
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 SNAP_TIME=$(date -u +"%Y-%m-%dT%H.%M")
 SNAP_FILENAME="${CHAIN_ID}_${SNAP_TIME}.tar.lz4"
-TEMP_DIR="$HOME/temp_snapshot"
 
-# Step 1: Sync Live Data to Temporary Directory
-echo "Syncing live data to temporary directory..."
-mkdir -p "$TEMP_DIR"
-mkdir -p "$TEMP_DIR/db"
-mkdir -p "$TEMP_DIR/cometbft/data"
-rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/db/" "$TEMP_DIR/db/"
-rsync -av --delete "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data/" "$TEMP_DIR/cometbft/data/"
+# Runtime mode for managing the node process: "service" (default) or "docker"
+RUN_MODE=${RUN_MODE:-"service"}
+DOCKER_CONTAINER=${DOCKER_CONTAINER:-"compose-namada-2-1"}
 
-# Step 2: Wait 30 seconds
-echo "Waiting 30 seconds to ensure files have stabilized..."
-sleep 30
+# Temporary working directory for snapshot build
+WORK_DIR=$(mktemp -d)
+DEST_DIR="$WORK_DIR/$CHAIN_ID"
+mkdir -p "$DEST_DIR"
 
-# Step 3: Fix Only Incomplete Files in Temporary Directory
-echo "Fixing incomplete files in the temporary directory..."
-rsync -av --existing --inplace "$CHAINDATA_PATH/$CHAIN_ID/db/" "$TEMP_DIR/db/"
-rsync -av --existing --inplace "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data/" "$TEMP_DIR/cometbft/data/"
+echo "Initial data sync (node stays online)...(temp dir: $DEST_DIR)"
+rsync -a --delete "$CHAINDATA_PATH/$CHAIN_ID/" "$DEST_DIR/"
 
-# Step 4: Create Snapshot from Temporary Directory
-echo "Creating snapshot..."
-sudo tar -C "$TEMP_DIR" -cf - db cometbft/data | lz4 - "$HOME/$SNAP_FILENAME"
+echo "Stopping namada-node for final sync..."
+if [ "$RUN_MODE" = "docker" ]; then
+  sudo docker stop "$DOCKER_CONTAINER"
+else
+  sudo systemctl stop namada-node
+fi
 
-# Step 5: Update Snapshot Location
-echo "Moving snapshot to web directory..."
-sudo rm -f $HTML_PATH/$CHAIN_ID*.lz4
-sudo mv -f "$HOME/$SNAP_FILENAME" "$HTML_PATH/$SNAP_FILENAME"
+echo "Final data sync (should be quick)..."
+rsync -a --delete "$CHAINDATA_PATH/$CHAIN_ID/" "$DEST_DIR/"
 
-# Step 6: Update HTML Index
-echo "Updating snapshot link in HTML..."
-sudo sed -i.bak -e "s|Snapshot: <a href=\".*\">Download</a>|Snapshot: <a href=\"https://$DOMAIN_PREFIX.$DOMAIN/$SNAP_FILENAME\">Download</a>|" "$HTML_PATH/index.html"
+echo "Starting namada-node back up..."
+if [ "$RUN_MODE" = "docker" ]; then
+  sudo docker start "$DOCKER_CONTAINER"
+else
+  sudo systemctl start namada-node
+fi
 
-# Step 7: Cleanup Temporary Directory
+echo "Creating compressed snapshot..."
+# Use multi-threaded LZ4 for faster compression
+sudo tar -C "$WORK_DIR" -cf - "$CHAIN_ID" | lz4 -9 - "$HOME/$SNAP_FILENAME"
+
+echo "Removing existing snapshots older than ..."
+# remove snapshots only older than 2 days
+sudo find $HTML_PATH -type f -name "*.tar.lz4" -mtime +2 -exec rm -f {} \;
+
+echo "Moving snapshot and updating link in HTML..."
+sudo mv -f $HOME/$SNAP_FILENAME $HTML_PATH/$SNAP_FILENAME
+sudo sed -i.bak -e "s|Snapshot: <a href=\".*\">Download.*</a>|Snapshot: <a href=\"https://$DOMAIN_PREFIX.$DOMAIN/$SNAP_FILENAME\">Download</a>|" "$HTML_PATH/index.html"
+
+# Cleanup temporary working directory
 echo "Cleaning up temporary files..."
-rm -rf "$TEMP_DIR"
+rm -rf "$WORK_DIR"
 
 echo "Snapshot completed successfully!"
