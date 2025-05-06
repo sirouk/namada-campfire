@@ -2,10 +2,17 @@
 
 # This script will stop the namada-2 node, create a snapshot using it's db contents, and restart the node
 
-# Example for crontab:
-# 0 */6 * * * RUN_MODE=docker DOMAIN_PREFIX=testnet.campfire /root/namada-campfire/scripts/make-snapshot.sh >> /root/namada-campfire/scripts/make-snapshot.sh.log 2>&1
-# or 
-# 0 */6 * * * RUN_MODE=service DOMAIN_PREFIX=testnet.campfire /root/namada-campfire/scripts/make-snapshot.sh >> /root/namada-campfire/scripts/make-snapshot.sh.log 2>&1
+# Examples for crontab:
+
+# campfire
+# 0 */6 * * * RUN_MODE=docker CHAINDATA_PATH=$HOME/chaindata/namada-2 DOMAIN_PREFIX=testnet.campfire /root/namada-campfire/scripts/make-snapshot.sh >> /root/namada-campfire/scripts/make-snapshot.sh.log 2>&1
+
+# housefire
+# 0 */6 * * * RUN_MODE=service CHAINDATA_PATH=$HOME/.local/share/namada DOMAIN_PREFIX=testnet.housefire /root/namada-campfire/scripts/make-snapshot.sh >> /root/namada-campfire/scripts/make-snapshot.sh.log 2>&1
+
+# mainnet 
+# 0 */6 * * * RUN_MODE=service CHAINDATA_PATH=$HOME/.local/share/namada DOMAIN_PREFIX=namada /root/namada-campfire/scripts/make-snapshot.sh >> /root/namada-campfire/scripts/make-snapshot.sh.log 2>&1
+
 
 # Variables
 DOMAIN_PREFIX=${DOMAIN_PREFIX:-"namada"}
@@ -27,6 +34,7 @@ WORK_DIR=$(mktemp -d)
 DEST_DIR="$WORK_DIR/$CHAIN_ID"
 mkdir -p "$DEST_DIR"
 
+
 echo "Initial data sync (node stays online)...(temp dir: $DEST_DIR)"
 rsync -a --delete "$CHAINDATA_PATH/$CHAIN_ID/" "$DEST_DIR/"
 
@@ -36,6 +44,13 @@ if [ "$RUN_MODE" = "docker" ]; then
 else
   sudo systemctl stop namada-node
 fi
+
+echo "Namada db status:"
+# get this file path of this script and go up one level to the tools directory
+TOOLS_DIR=$(dirname "$(readlink -f "$0")")/..
+# run the migrate-masp-events command
+echo $CHAINDATA_PATH/$CHAIN_ID/cometbft
+$TOOLS_DIR/tools/migrate-masp-events last-state -cometbft-homedir $CHAINDATA_PATH/$CHAIN_ID/cometbft
 
 echo "Final data sync (should be quick)..."
 rsync -a --delete "$CHAINDATA_PATH/$CHAIN_ID/" "$DEST_DIR/"
