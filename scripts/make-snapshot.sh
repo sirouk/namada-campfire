@@ -24,20 +24,20 @@ export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); pri
 export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
 SNAP_TIME=$(date -u +"%Y-%m-%dT%H.%M")
 SNAP_FILENAME="${CHAIN_ID}_${SNAP_TIME}.tar.lz4"
+TEMP_DIR=$(mktemp -d)
 
 # Runtime mode for managing the node process: "service" (default) or "docker"
 RUN_MODE=${RUN_MODE:-"service"}
 DOCKER_CONTAINER=${DOCKER_CONTAINER:-"compose-namada-2-1"}
 
-# Temporary working directory for snapshot build
-WORK_DIR=$(mktemp -d)
-DEST_DIR="$WORK_DIR/$CHAIN_ID"
-mkdir -p "$DEST_DIR"
+# Step 1: Rsync db and cometbft/data while node is running
+echo "Syncing live data to temporary directory..."
+mkdir -p "$TEMP_DIR/db"
+mkdir -p "$TEMP_DIR/cometbft/data"
+rsync -a --delete --exclude='*.json' --exclude='*.toml' "$CHAINDATA_PATH/$CHAIN_ID/db/" "$TEMP_DIR/db/"
+rsync -a --delete --exclude='*.json' --exclude='*.toml' "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data/" "$TEMP_DIR/cometbft/data/"
 
-
-echo "Initial data sync (node stays online)...(temp dir: $DEST_DIR)"
-rsync -a --delete "$CHAINDATA_PATH/$CHAIN_ID/" "$DEST_DIR/"
-
+# Step 2: Stop the node for final sync
 echo "Stopping namada-node for final sync..."
 if [ "$RUN_MODE" = "docker" ]; then
   sudo docker stop "$DOCKER_CONTAINER"
@@ -45,16 +45,12 @@ else
   sudo systemctl stop namada-node
 fi
 
-echo "Namada db status:"
-# get this file path of this script and go up one level to the tools directory
-TOOLS_DIR=$(dirname "$(readlink -f "$0")")/..
-# run the migrate-masp-events command
-echo $CHAINDATA_PATH/$CHAIN_ID/cometbft
-$TOOLS_DIR/tools/migrate-masp-events last-state -cometbft-homedir $CHAINDATA_PATH/$CHAIN_ID/cometbft
+# Step 3: Final rsync to catch any incomplete files
+echo "Final rsync to catch incomplete files..."
+rsync -a --existing --inplace --exclude='*.json' --exclude='*.toml' "$CHAINDATA_PATH/$CHAIN_ID/db/" "$TEMP_DIR/db/"
+rsync -a --existing --inplace --exclude='*.json' --exclude='*.toml' "$CHAINDATA_PATH/$CHAIN_ID/cometbft/data/" "$TEMP_DIR/cometbft/data/"
 
-echo "Final data sync (should be quick)..."
-rsync -a --delete "$CHAINDATA_PATH/$CHAIN_ID/" "$DEST_DIR/"
-
+# Step 4: Start the node again
 echo "Starting namada-node back up..."
 if [ "$RUN_MODE" = "docker" ]; then
   sudo docker start "$DOCKER_CONTAINER"
@@ -62,20 +58,22 @@ else
   sudo systemctl start namada-node
 fi
 
+# Step 5: Create compressed snapshot (only db and cometbft/data)
 echo "Creating compressed snapshot..."
-# Use multi-threaded LZ4 for faster compression
-sudo tar -C "$WORK_DIR" -cf - "$CHAIN_ID" | lz4 -9 - "$HOME/$SNAP_FILENAME"
+sudo tar -C "$TEMP_DIR" -cf - db cometbft/data | lz4 -9 - "$HOME/$SNAP_FILENAME"
 
-echo "Removing existing snapshots older than ..."
-# remove snapshots only older than 2 days
+# Step 6: Remove old snapshots (older than 2 days)
+echo "Removing existing snapshots older than 2 days..."
 sudo find $HTML_PATH -type f -name "*.tar.lz4" -mtime +2 -exec rm -f {} \;
 
-echo "Moving snapshot and updating link in HTML..."
-sudo mv -f $HOME/$SNAP_FILENAME $HTML_PATH/$SNAP_FILENAME
+# Step 7: Move snapshot and update link in HTML
+echo "Moving snapshot to web directory..."
+sudo mv -f "$HOME/$SNAP_FILENAME" "$HTML_PATH/$SNAP_FILENAME"
+echo "Updating snapshot link in HTML..."
 sudo sed -i.bak -e "s|Snapshot: <a href=\".*\">Download.*</a>|Snapshot: <a href=\"https://$DOMAIN_PREFIX.$DOMAIN/$SNAP_FILENAME\">Download</a>|" "$HTML_PATH/index.html"
 
-# Cleanup temporary working directory
+# Step 8: Cleanup temporary directory
 echo "Cleaning up temporary files..."
-rm -rf "$WORK_DIR"
+rm -rf "$TEMP_DIR"
 
 echo "Snapshot completed successfully!"

@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Examples:
+    #Mainnet:
+    # CHAINDATA_PATH=$BASE_DIR ~/namada-campfire/scripts/launch-interface.sh
+
+    # Campfire
+    # CHAINDATA_PATH=$HOME/chaindata/namada-1 ~/namada-campfire/scripts/launch-interface.sh
+
 # Run this script after the chain is running to write the namada-interface .env file, rebuild and start the container.
 # Note: as this rebuilds the container it takes some time to complete
 REPO_NAME="namada-interface"
