@@ -202,6 +202,7 @@ if ! [[ $# -eq 1 && $1 == "-y" ]]; then
     export LOGS_NOFOLLOW=true
     $HOME/namada-campfire/scripts/launch-faucet-be.sh
     $HOME/namada-campfire/scripts/launch-faucet-fe.sh
+    $HOME/namada-campfire/scripts/launch-supply.sh
     
     # on housefire, relaunch these manually since they are updated frequently
     $HOME/namada-campfire/scripts/launch-indexer.sh
