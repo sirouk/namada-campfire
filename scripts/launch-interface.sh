@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
 
+# Examples:
+    # Mainnet and Housefire:
+    # unset BRANCH; CHAINDATA_PATH=$BASE_DIR ~/namada-campfire/scripts/launch-interface.sh
+
+    # use a branch
+    # BRANCH=namadillo@v1.21.0 CHAINDATA_PATH=$BASE_DIR ~/namada-campfire/scripts/launch-interface.sh
+
+    # Campfire
+    # unset BRANCH; CHAINDATA_PATH=$HOME/chaindata/namada-1 ~/namada-campfire/scripts/launch-interface.sh
+
 # Run this script after the chain is running to write the namada-interface .env file, rebuild and start the container.
 # Note: as this rebuilds the container it takes some time to complete
 REPO_NAME="namada-interface"
 REPO_DIR="$HOME/$REPO_NAME"
 INTERFACE_DIR="apps/namadillo"
+export BRANCH=${BRANCH:-""}
 
 
 ### Grab the repo
@@ -19,9 +30,14 @@ cd $REPO_DIR && git fetch --all
 #git checkout tags/v1.0.4
 
 # Get the latest tag
-LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-git checkout $LATEST_TAG
-git reset --hard $LATEST_TAG
+if [ -z "${BRANCH}" ]; then
+    LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+    git checkout $LATEST_TAG
+    git reset --hard $LATEST_TAG
+else
+    git checkout $BRANCH
+    git reset --hard $BRANCH
+fi
 git pull
 
 #git checkout main
@@ -53,16 +69,16 @@ env_file="$REPO_DIR/$INTERFACE_DIR/.env"
     echo "NODE_ENV=development"
     echo "NAMADA_INTERFACE_LOCAL=false"
 
-    echo "NAMADA_INTERFACE_NAMADA_ALIAS=\"Namada Campfire\""
+    echo "NAMADA_INTERFACE_NAMADA_ALIAS=\"Namadillo\""
     echo "NAMADA_INTERFACE_NAMADA_TOKEN=$NAM"
     echo "NAMADA_INTERFACE_NAMADA_CHAIN_ID=$CHAIN_ID"
     echo "NAMADA_INTERFACE_NAMADA_URL=https://rpc.$DOMAIN:443"
+    #echo "NAMADA_INTERFACE_NAMADA_URL=https://namada-rpc.tududes.com:443" # load balanced RPC
     echo "RPC_URL=https://rpc.$DOMAIN:443" # used for bootstrap_config.sh
     
     echo "NAMADA_INTERFACE_NAMADA_BECH32_PREFIX=tnam"
     echo "NAMADA_INTERFACE_INDEXER_URL=https://indexer.$DOMAIN:443"
     echo "INDEXER_URL=https://indexer.$DOMAIN:443" # used for bootstrap_config.sh
-
     echo "MASP_INDEXER_URL=https://masp.$DOMAIN:443" # used for bootstrap_config.sh
 
     # echo "REACT_APP_NAMADA_FAUCET_ADDRESS=\"$FAUCET_ADDRESS\""
