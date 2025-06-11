@@ -53,7 +53,7 @@ if [ "$BUILD_ONLY" = false ]; then
   fi
 
   echo "Removing namada-supply-app images"
-  docker image rm --force $(docker image ls --all | grep -E '^namada-supply-app.*$' | awk '{print $3}') 2>/dev/null || true
+  docker image rm --force $(docker image ls --all | grep -E '^namada\/.*supply.*$' | awk '{print $3}') 2>/dev/null || true
   docker image rm --force $(docker image ls --all | grep '<none>' | awk '{print $3}') 2>/dev/null || true
 
   # prune all volumes (db data)
