@@ -62,9 +62,15 @@ fi
 echo "Creating compressed snapshot..."
 sudo tar -C "$TEMP_DIR" -cf - db cometbft/data | lz4 -9 - "$HOME/$SNAP_FILENAME"
 
-# Step 6: Remove old snapshots (older than 2 days)
-echo "Removing existing snapshots older than 2 days..."
-sudo find $HTML_PATH -type f -name "*.tar.lz4" -mtime +2 -exec rm -f {} \;
+# Step 6: Remove old snapshots (keep only the most recent one as fallback)
+echo "Removing old snapshots (keeping most recent as fallback)..."
+SNAPSHOT_FILES=$(sudo find $HTML_PATH -type f -name "*.tar.lz4" -printf '%T@ %p\n' | sort -nr | tail -n +2 | cut -d' ' -f2-)
+if [ -n "$SNAPSHOT_FILES" ]; then
+  echo "$SNAPSHOT_FILES" | sudo xargs rm -f
+  echo "Removed $(echo "$SNAPSHOT_FILES" | wc -l) old snapshot(s)"
+else
+  echo "No old snapshots to remove"
+fi
 
 # Step 7: Move snapshot and update link in HTML
 echo "Moving snapshot to web directory..."
