@@ -6,7 +6,7 @@
   # unset BRANCH; BUILD_ONLY=false WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
 
   # use branch:
-  # BUILD_ONLY=false BRANCH=tiago/housefire-indexer-1.3.x WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
+  # BUILD_ONLY=false BRANCH=v1.3.0 WIPE_DB=true CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-masp-indexer.sh && docker logs -f --tail 100 namada-masp-indexer-crawler-1
 
 # Example Campfire:
 
@@ -116,4 +116,48 @@ if [ "$BUILD_ONLY" = true ]; then
 else
   # Build and start the containers (original behavior)
   docker compose -f $HOME/namada-masp-indexer/docker-compose.yml --env-file $env_file up -d
+fi
+
+
+# If WIPE_DB is true, then we need to restore the database from the snapshot
+if [ "$WIPE_DB" = true ]; then
+  # restore the database from the snapshot
+
+  # Get the snapshot URL from the user
+  echo "Visit https://docs.emberstake.xyz/networks/namada/snapshots#namada-masp-indexer-database-snapshot for the snapshot URL"
+  read -p "Enter the snapshot URL: " SNAPSHOT_URL
+
+  # Download the snapshot
+  wget -O dump.sql $SNAPSHOT_URL
+
+  # Stop the containers
+  docker compose down
+
+  # Start the postgres container
+  docker compose up -d postgres
+
+  # Copy the snapshot to the postgres container
+  docker compose cp dump.sql postgres:/tmp/dump.sql
+
+  # Wait for postgres to be fully ready (check health status)
+  echo "Waiting for postgres container to be healthy..."
+  while ! docker compose ps postgres | grep -q "healthy"; do
+    echo "Waiting for postgres container to be healthy..."
+    sleep 2
+  done
+  
+  # Give it a few more seconds to ensure PostgreSQL is fully ready
+  sleep 5
+
+  # Restore the database
+  docker compose exec postgres pg_restore -U postgres -d masp_indexer_local --clean --if-exists /tmp/dump.sql --verbose
+
+  # Remove the snapshot from the container
+  docker compose exec postgres rm /tmp/dump.sql
+  
+  # Remove the local snapshot file
+  rm -f dump.sql
+
+  # Start the containers
+  docker compose up -d
 fi
