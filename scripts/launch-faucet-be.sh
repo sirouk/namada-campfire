@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 
+# Examples:
+    # Mainnet and Housefire:
+    # FAUCET_PK=tnamexample CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-faucet-be.sh
+
+    # Campfire
+    # CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-faucet-be.sh
+
+
 ### Grab the repo
 rm -rf $HOME/namada-faucet
 cd $HOME
 #git clone -b campfire-faucet https://github.com/sirouk/namada-faucet.git
-#git clone -b master https://github.com/heliaxdev/namada-faucet
-git clone -b campfire-faucet https://github.com/vknowable/namada-faucet.git
+git clone -b master https://github.com/heliaxdev/namada-faucet
+#git clone -b campfire-faucet https://github.com/vknowable/namada-faucet.git
 
 
 # Copy over the docker file
@@ -19,9 +27,19 @@ if [ -z "${LOGS_NOFOLLOW}" ]; then
 fi
 
 
+export PORT=${PORT:-5010}
+
+export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
+export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
+
+export FOUND_CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$CHAINDATA_PATH/global-config.toml")
+export CHAIN_ID=${CHAIN_ID:-$FOUND_CHAIN_ID}
+
 # Fetch the faucet private key
-export CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$HOME/chaindata/namada-1/global-config.toml")
-export FAUCET_PK=$(awk '/\[secret_keys\]/ {found=1} found && /faucet-1 = / {gsub(/.*= "/, ""); sub(/"$/, ""); sub(/unencrypted:/, ""); print; exit}' "$HOME/chaindata/namada-1/$CHAIN_ID/wallet.toml")
+#export CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$HOME/chaindata/namada-1/global-config.toml")
+echo "CHAIN_ID=$CHAIN_ID"
+#exit;
+export FAUCET_PK=${FAUCET_PK:-$(awk '/\[secret_keys\]/ {found=1} found && /faucet-1 = / {gsub(/.*= "/, ""); sub(/"$/, ""); sub(/unencrypted:/, ""); print; exit}' "$HOME/chaindata/namada-1/$CHAIN_ID/wallet.toml")}
 
 
 # to get our $DOMAIN
@@ -31,7 +49,7 @@ source $HOME/campfire.env
 env_file=$HOME/namada-faucet/.env
 {
 
-    echo "PORT=5000"
+    echo "PORT=$PORT"
     echo "DIFFICULTY=1"
     echo "PRIVATE_KEY=$FAUCET_PK"
     echo "CHAIN_START=1"
@@ -52,7 +70,7 @@ docker build -t faucet-be:local .
 # Start the faucet backend
 cd $HOME/namada-faucet
 #docker run --name faucet-be -d --network host faucet-be:local ./server --cargo-env development --difficulty 3 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port 5000 --rps 10 --rpc http://127.0.0.1:26657
-docker run --name faucet-be -d --network host faucet-be:local ./server --difficulty 1 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port 5000 --rps 10 --rpc http://127.0.0.1:26657
+docker run --name faucet-be -d --network host faucet-be:local ./server --difficulty 1 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port $PORT --rps 10 --rpc http://127.0.0.1:26657
 
 if [ -z "${LOGS_NOFOLLOW}" ]; then
     echo "**************************************************************************************"
