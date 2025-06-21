@@ -5,7 +5,7 @@
     # unset BRANCH; CHAINDATA_PATH=$BASE_DIR ~/namada-campfire/scripts/launch-interface.sh
 
     # use a branch
-    # BRANCH=namadillo@v1.21.0 CHAINDATA_PATH=$BASE_DIR ~/namada-campfire/scripts/launch-interface.sh
+    # BRANCH=namadillo@v1.27.0 CHAINDATA_PATH=$BASE_DIR ~/namada-campfire/scripts/launch-interface.sh
 
     # Campfire
     # unset BRANCH; CHAINDATA_PATH=$HOME/chaindata/namada-1 ~/namada-campfire/scripts/launch-interface.sh

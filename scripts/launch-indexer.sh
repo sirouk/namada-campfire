@@ -5,7 +5,7 @@
     # unset BRANCH; BUILD_ONLY=false WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-indexer.sh && docker logs -f --tail 100 namada-indexer-transactions-1
 
     # use branch:
-    # BUILD_ONLY=false BRANCH=grarco/update-masp-events-rebased+fix WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-indexer.sh && docker logs -f --tail 100 namada-indexer-transactions-1
+    # BUILD_ONLY=false BRANCH=v3.2.0 WIPE_DB=false CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-indexer.sh && docker logs -f --tail 100 namada-indexer-transactions-1
 
 # Example Campfire:
 
@@ -117,7 +117,7 @@ if [ "$BUILD_ONLY" = false ]; then
 fi
 
 # Fix the postgres-data to postgres_data in the docker-compose.yml file
-sed -i 's/postgres-data/postgres_data/g' $HOME/namada-indexer/docker-compose.yml
+#sed -i 's/postgres-data/postgres_data/g' $HOME/namada-indexer/docker-compose.yml
 
 # v2.5.2 is an all-in-one compose file without an includes directive
 # Check if the campfire directory exists for the compose file
@@ -136,4 +136,48 @@ if [ "$BUILD_ONLY" = true ]; then
 else
   # Build and start the containers
   docker compose -f $HOME/namada-indexer/docker-compose.yml --env-file $env_file up -d
+fi
+
+
+# If WIPE_DB is true, then we need to restore the database from the snapshot
+if [ "$WIPE_DB" = true ]; then
+  # restore the database from the snapshot
+
+  # Get the snapshot URL from the user
+  echo "Visit https://docs.emberstake.xyz/networks/namada/snapshots#namada-indexer-database-snapshot for the snapshot URL"
+  read -p "Enter the snapshot URL: " SNAPSHOT_URL
+
+  # Download the snapshot
+  wget -O dump.sql $SNAPSHOT_URL
+
+  # Stop the containers
+  docker compose down
+
+  # Start the postgres container
+  docker compose up -d postgres
+
+  # Copy the snapshot to the postgres container
+  docker compose cp dump.sql postgres:/tmp/dump.sql
+
+  # Wait for postgres to be fully ready (check health status)
+  echo "Waiting for postgres container to be healthy..."
+  while ! docker compose ps postgres | grep -q "healthy"; do
+    echo "Waiting for postgres container to be healthy..."
+    sleep 2
+  done
+  
+  # Give it a few more seconds to ensure PostgreSQL is fully ready
+  sleep 5
+
+  # Restore the database
+  docker compose exec postgres pg_restore -U postgres -d namada-indexer --clean --if-exists /tmp/dump.sql --verbose
+
+  # Remove the snapshot from the container
+  docker compose exec postgres rm /tmp/dump.sql
+  
+  # Remove the local snapshot file
+  rm -f dump.sql
+
+  # Start the containers
+  docker compose up -d
 fi
