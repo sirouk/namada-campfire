@@ -117,7 +117,7 @@ if [ "$BUILD_ONLY" = false ]; then
 fi
 
 # Fix the postgres-data to postgres_data in the docker-compose.yml file
-#sed -i 's/postgres-data/postgres_data/g' $HOME/namada-indexer/docker-compose.yml
+sed -i 's/postgres-data/postgres_data/g' $HOME/namada-indexer/docker-compose.yml
 
 # v2.5.2 is an all-in-one compose file without an includes directive
 # Check if the campfire directory exists for the compose file
