@@ -13,7 +13,8 @@
 rm -rf $HOME/namada-interface
 cd $HOME
 #git clone -b v0.1.0-0e77e71 https://github.com/anoma/namada-interface.git
-git clone -b main https://github.com/anoma/namada-interface.git
+#git clone -b main https://github.com/anoma/namada-interface.git
+git clone -b sirouk-cf-turnstile https://github.com/sirouk/namada-interface.git
 
 
 # Copy over the files for docker and nginx
@@ -24,6 +25,8 @@ cp -f $HOME/namada-campfire/docker/container-build/faucet-frontend/nginx.conf $H
 
 # Prepare the environment variables
 #export CHAIN_ID=$(awk -F'=' '/default_chain_id/ {gsub(/[ "]/, "", $2); print $2}' "$HOME/chaindata/namada-1/global-config.toml")
+
+export TURNSTILE_SITE_KEY="0x4AAAAAABrBjb5c0SPOuoE5" # PUBLIC FACING
 
 export CAMPFIRE_CHAIN_DATA="$HOME/chaindata/namada-1"
 export CHAINDATA_PATH=${CHAINDATA_PATH:-$CAMPFIRE_CHAIN_DATA}
@@ -62,6 +65,9 @@ env_file=$HOME/namada-interface/apps/faucet/.env
     #echo "INDEXER_URL=https://indexer.$DOMAIN:443"
     #echo "RPC_URL=https://rpc.$DOMAIN:443"
     #echo "CHAIN_ID=$CHAIN_ID"
+
+    # cloudflare turnstile site key
+    echo "NAMADA_INTERFACE_TURNSTILE_SITEKEY=$TURNSTILE_SITE_KEY"
 
 } > "$env_file"
 

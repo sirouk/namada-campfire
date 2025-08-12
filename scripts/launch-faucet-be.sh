@@ -2,18 +2,19 @@
 
 # Examples:
     # Mainnet and Housefire:
-    # FAUCET_PK=tnamexample CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-faucet-be.sh
+    # FAUCET_PK=tnamexample TURNSTILE_SECRET=somesecret CHAINDATA_PATH=$BASE_DIR $HOME/namada-campfire/scripts/launch-faucet-be.sh
 
     # Campfire
-    # CHAINDATA_PATH=$HOME/chaindata/namada-1 $HOME/namada-campfire/scripts/launch-faucet-be.sh
+    # CHAINDATA_PATH=$HOME/chaindata/namada-1 TURNSTILE_SECRET=somesecret $HOME/namada-campfire/scripts/launch-faucet-be.sh
 
 
 ### Grab the repo
 rm -rf $HOME/namada-faucet
 cd $HOME
 #git clone -b campfire-faucet https://github.com/sirouk/namada-faucet.git
-git clone -b master https://github.com/heliaxdev/namada-faucet
 #git clone -b campfire-faucet https://github.com/vknowable/namada-faucet.git
+#git clone -b master https://github.com/heliaxdev/namada-faucet
+git clone -b sirouk-cf-turnstile https://github.com/sirouk/namada-faucet
 
 
 # Copy over the docker file
@@ -58,6 +59,7 @@ env_file=$HOME/namada-faucet/.env
     echo "WITHDRAW_LIMIT=1000"
     #echo "AUTH_KEY=my_auth_key"
     echo "RPS=10"
+    echo "TURNSTILE_SECRET=$TURNSTILE_SECRET"
 
 } > "$env_file"
 
@@ -70,7 +72,7 @@ docker build -t faucet-be:local .
 # Start the faucet backend
 cd $HOME/namada-faucet
 #docker run --name faucet-be -d --network host faucet-be:local ./server --cargo-env development --difficulty 3 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port 5000 --rps 10 --rpc http://127.0.0.1:26657
-docker run --name faucet-be -d --network host faucet-be:local ./server --difficulty 1 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port $PORT --rps 10 --rpc http://127.0.0.1:26657
+docker run --name faucet-be -d --network host faucet-be:local ./server --difficulty 1 --private-key $FAUCET_PK --chain-start 1 --chain-id $CHAIN_ID --port $PORT --rps 10 --rpc http://127.0.0.1:26657 --turnstile-secret $TURNSTILE_SECRET
 
 if [ -z "${LOGS_NOFOLLOW}" ]; then
     echo "**************************************************************************************"
